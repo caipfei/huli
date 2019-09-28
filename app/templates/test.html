@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <!-- import CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+</head>
+<body>
+<div id="app">
+    <div>{[ message ]}</div>
+    <el-alert title="成功提示的文案" type="success" effect="dark" v-if="true"></el-alert>
+    <el-button @click="visible = true">Button</el-button>
+    <el-dialog :visible.sync="visible" title="Hello world">
+        <p>Try Element</p>
+    </el-dialog>
+    <template>
+        <el-table
+                :data="tableData"
+                style="width: 100%">
+            <el-table-column
+                    prop="date"
+                    label="日期"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="name"
+                    label="姓名"
+                    width="180">
+            </el-table-column>
+            <el-table-column
+                    prop="address"
+                    label="地址">
+            </el-table-column>
+        </el-table>
+    </template>
+
+    <template>
+        <el-tabs v-model="activeName" @tab-click="handleClick">
+            <el-tab-pane label="用户管理" name="first">用户管理</el-tab-pane>
+            <el-tab-pane label="配置管理" name="second">配置管理</el-tab-pane>
+            <el-tab-pane label="角色管理" name="third">角色管理</el-tab-pane>
+            <el-tab-pane label="定时任务补偿" name="fourth">定时任务补偿</el-tab-pane>
+        </el-tabs>
+    </template>
+</div>
+</body>
+<!-- import Vue before Element -->
+<script src="https://unpkg.com/vue/dist/vue.js"></script>
+<!-- import JavaScript -->
+<script src="https://unpkg.com/element-ui/lib/index.js"></script>
+<script>
+    new Vue({
+        el: '#app',
+        delimiters: ['{[', ']}'],
+        data: {
+            visible: false,
+            message: 'hello vue',
+            tableData: [{
+                date: '2016-05-02',
+                name: '王小虎',
+                address: '上海市普陀区金沙江路 1518 弄'
+            }, {
+                date: '2016-05-04',
+                name: '王小虎',
+                address: '上海市普陀区金沙江路 1517 弄'
+            }, {
+                date: '2016-05-01',
+                name: '王小虎',
+                address: '上海市普陀区金沙江路 1519 弄'
+            }, {
+                date: '2016-05-03',
+                name: '王小虎',
+                address: '上海市普陀区金沙江路 1516 弄'
+            }],
+            activeName: 'second'
+        }
+    })
+</script>
+</html>

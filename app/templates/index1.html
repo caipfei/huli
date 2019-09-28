@@ -1,0 +1,169 @@
+{% extends 'base.html' %}
+
+{% block title %}护理管理信息系统{% endblock %}
+
+{% block style %}
+    .el-table{
+        min-height:350px;
+    }
+{% endblock %}
+
+{% block  main %}
+    <div style="margin-bottom:20px;padding-left:20px;"><strong>护理人员列表</strong></div>
+    <div class="content-tool">
+        <el-input v-model="search" placeholder="请输入搜索内容" style="display:inline-block;width:300px"></el-input>
+        <el-button type="primary" icon="el-icon-search" size="medium" @click="handleSearch">查询</el-button>
+        <el-button type="primary" icon="el-icon-plus" size="medium" @click="add_nurse">添加</el-button>
+        <el-button type="primary" icon="el-icon-delete" size="medium" @click="del_nurse">删除</el-button>
+        <el-button type="primary" icon="el-icon-upload" size="medium" @click="">批量导入</el-button>
+        <el-button type="primary" icon="el-icon-refresh" size="medium" @click="refresh_table">刷新列表</el-button>
+    </div>
+    <el-table :data="page_data" ref="nurseList" :header-cell-style="{background:'#eef1f6',color:'#606266'}" v-loading="loading" element-loading-text="数据加载中"
+         :default-sort="{prop: sort_prop, order: sort_order}" @sort-change="handleSortChange">
+        <el-table-column type="selection" width="60px" align="center"></el-table-column>
+        <el-table-column prop="emp_sn" label="工号" sortable="custom"></el-table-column>
+        <el-table-column prop="name" label="姓名" sortable="custom"></el-table-column>
+        <el-table-column prop="sex" label="性别" sortable="custom"></el-table-column>
+        <el-table-column prop="dept" label="科室" sortable="custom"></el-table-column>
+    </el-table>
+    <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="currentPage"
+        :page-sizes="[1, 2, 3, 4, 20]"
+        :page-size="pageSize"
+        layout="total,sizes,prev,pager,next,jumper"
+        :total="total"
+        :page-count="total_page"
+    >
+    </el-pagination>
+{% endblock %}
+
+{% block script %}
+new Vue({
+    el: '#app',
+    delimiters: ['{[', ']}'],
+    data: {
+        search: '',
+        nickname: JSON.parse(window.sessionStorage.getItem('user_info')).nickname,
+        nurses: [],
+        filter_nurses: [],
+        loading: true,
+        sort_prop: 'emp_sn',
+        sort_order: 'ascending',
+        currentPage: 1,
+        pageSize: 20,
+        total: 0,
+        total_page: 0,
+        page_data: []
+    },
+    methods: {
+        get_nurses(){
+            axios({
+                method: 'get',
+                url: '{{ url_for('.get_nurses') }}'
+            }).then(response => {
+                this.loading = false
+                if(response.data.code == 0){
+                    this.nurses = response.data.data
+                    this.filter_nurses = this.nurses
+                    if(this.sort_order == 'ascending'){
+                        this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})
+                    }else{
+                        this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})
+                    }
+                    this.page_data = this.nurses.slice(0, this.pageSize)
+                    this.currentPage = 1
+                    this.total = this.nurses.length
+                    this.total_page = Math.ceil(this.total / this.pageSize)
+                }
+            }).catch(response => {
+                this.loading = false
+                this.$message.error('获取护理人员列表失败')
+            })
+
+        },
+        handleSearch(){
+            this.filter_nurses = this.nurses.filter(data => {
+                return Object.keys(data).some(key => {
+                    return String(data[key]).toLowerCase().indexOf(this.search) > -1
+                })
+            })
+            this.currentPage = 1
+            this.page_data = this.filter_nurses.slice(0, this.pageSize)
+            this.total = this.filter_nurses.length
+            this.total_page = Math.ceil(this.total / this.pageSize)
+        },
+        add_nurse(){
+            window.location.assign('{{ url_for('.add_nurse') }}')
+        },
+        del_nurse(){
+            let emps = []
+            this.$refs.nurseList.selection.map(item => emps.push(item.emp_sn))
+            if(emps.length == 0){
+                this.$message({
+                    showClose: true,
+                    message:'请选择要删除的人员',
+                    type: 'warning'
+                })
+                return
+            }
+            axios({
+                method: 'post',
+                url: '{{ url_for('.del_nurse') }}',
+                data: {emps: emps}
+            }).then(response => {
+                if(response.data.code == 0){
+                    this.get_nurses()
+                    this.$message.success('删除成功')
+                }else{
+                    this.$message.error('删除失败')
+                }
+            }).catch(response => {
+                this.$message.error('删除失败')
+            })
+        },
+        refresh_table(){
+            this.loading = true
+            this.search = ''
+            this.get_nurses()
+        },
+        handleSizeChange(val){
+            let total_page = Math.ceil(this.total / val)
+            if(this.currentPage>total_page){
+                this.currentPage = total_page
+            }
+            this.pageSize = val
+            this.page_data = this.filter_nurses.slice((this.currentPage-1)*val, this.currentPage*val)
+        },
+        handleCurrentChange(val){
+            this.currentPage = val
+            this.page_data = this.filter_nurses.slice((val-1)*this.pageSize, val*this.pageSize)
+        },
+        handleSortChange(column){
+            let sort_prop = column.prop
+            let sort_order = column.order
+            this.sort_prop = sort_prop
+            this.sort_order = sort_order
+
+            //先根据排序规则排序
+            if(sort_order == 'ascending'){
+                this.nurses.sort((a, b) => {return a[sort_prop] > b[sort_prop]})
+            }else{
+                this.nurses.sort((a,b) => {return b[sort_prop] > a[sort_prop]})
+            }
+            //如果有搜索，再将数据筛选出来
+            this.filter_nurses = this.nurses.filter(data => {
+                return Object.keys(data).some(key => {
+                    return String(data[key]).toLowerCase().indexOf(this.search) > -1
+                })
+            })
+            this.currentPage = 1
+            this.page_data = this.filter_nurses.slice(0, this.pageSize)
+        }
+    },
+    mounted(){
+        this.get_nurses()
+    }
+})
+{% endblock %}

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>护理信息管理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/element-ui@2.12.0.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom-theme.css') }}">
+    <style lang="scss" scoped>
+        .login-container {
+            border-radius: 5px;
+            background-clip: padding-box;
+            margin: 0 auto;
+            position: relative;
+            top: 100px;
+            width: 350px;
+            padding: 35px 35px 15px 35px;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 0 25px #cac6c6;
+        }
+
+        .title {
+            margin: 0px auto 40px auto;
+            text-align: center;
+            color: #505458;
+        }
+
+        .remember {
+            margin: 0px 0px 35px 0px;
+        }
+
+    </style>
+</head>
+<body>
+<div id="app">
+    <template>
+        <el-form :model="login_form" :rules="login_rules" size="medium" ref="login_form" label-position="left"
+                 label-width="0px" class="demo-ruleForm login-container">
+            <h3 class="title">用户登陆</h3>
+            <el-alert :title="alert_msg" type="warning" v-show="alert_show"></el-alert>
+            <el-form-item prop="username">
+                <el-input type="text" v-model="login_form.username" auto-complete="off" placeholder="请输入工号"
+                          :maxlength="32" autofocus></el-input>
+            </el-form-item>
+            <el-form-item prop="password">
+                <el-input type="password" v-model="login_form.password" auto-complete="off" placeholder="请输入密码"
+                          :maxlength="20"></el-input>
+            </el-form-item>
+            <el-checkbox v-model="checked" checked class="remember">记住密码</el-checkbox>
+            <el-form-item>
+                <el-button type="primary" class="full-w" @click.native.prevent="handleSubmit"
+                           :loading="logining">登录
+                </el-button>
+            </el-form-item>
+        </el-form>
+    </template>
+</div>
+</body>
+<script src="{{ url_for('static', filename='js/vue@2.6.10.js') }}"></script>
+<script src="{{ url_for('static', filename='js/element-ui@2.12.0.js') }}"></script>
+<script src="{{ url_for('static', filename='js/axios.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/jquery-3.4.1.min.js') }}"></script>
+<script src="{{ url_for('static', filename='js/sha256.min.js') }}"></script>
+
+<script>
+    new Vue({
+        el: '#app',
+        delimiters: ['{[', ']}'],
+        data: {
+            login_form: {
+                username: '',
+                password: ''
+            },
+            login_rules: {
+                username: [
+                    {required: true, message: '请输入工号', trigger: 'blur'}
+                ],
+                password: [
+                    {required: true, message: '请输入密码', trigger: 'blur'}
+                ]
+            },
+            checked: true,
+            logining: false,
+            alert_msg: '{{ alert_msg }}',
+            alert_show: {{ alert_show }}
+        },
+        methods: {
+            handleSubmit() {
+                this.$refs.login_form.validate(valid => {
+                    if (valid) {
+                        this.logining = true
+                        let hash = sha256.create()
+                        hash.update(this.login_form.password)
+                        let hash_password = hash.hex()
+                        let data = {
+                            username: this.login_form.username,
+                            password: hash_password
+                        }
+                        axios({
+                            method: 'post',
+                            url: '{{ url_for('.login') }}',
+                            data: data
+                        }).then(response => {
+                            if(response.data.code == 0){
+                                window.sessionStorage.setItem('user_info', JSON.stringify(response.data.data))
+                                location.assign('/huli/index')
+                            }else{
+                                console.log(response.data)
+                                this.alert_msg = response.data['msg']
+                                this.alert_show = true
+                            }
+                        }).catch(response => {
+                            console.log('请求失败' + response.status + ',' + response.statusText)
+                            this.alert_msg = '登陆失败，请稍后重试或联系管理员'
+                            this.alert_show = true
+                        })
+                        this.logining = false
+                    }
+                })
+            }
+        },
+        mounted() {
+            this.$nextTick(() => {
+                $(document).on('keyup', (event) => {
+                    if (event.keyCode === 13) {
+                        this.handleSubmit()
+                    }
+                })
+            })
+        },
+        /*destroyed(){
+            $(document).off('keyup')
+        }*/
+    })
+</script>
+</html>
+
+
+
+
+
+
+

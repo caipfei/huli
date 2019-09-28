@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}护理管理信息系统{% endblock %}
+
+{% block style %}
+
+{% endblock %}
+
+{% block main %}
+    <div style="margin-bottom:20px;padding-left:20px;"><strong>添加护理人员</strong></div>
+    <el-form :model="nurseData" ref="nurseDataForm" class="demo-ruleForm" label-width="120px" :rules="addFormRules">
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="工号：" prop="emp_sn">
+                    <el-input v-model.trim="nurseData.emp_sn"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="姓名：" prop="name">
+                    <el-input v-model.trim="nurseData.name"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="性别：" prop="sex">
+                    <el-select v-model="nurseData.sex">
+                        <el-option v-for="item in sexOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="科室：" prop="dept_id">
+                    <el-select v-model="nurseData.dept_id">
+                        <el-option v-for="item in depts" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="籍贯：" prop="native">
+                    <el-input v-model.trim="nurseData.native"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="身份证号：" prop="id_card">
+                    <el-input v-model.trim="nurseData.id_card" @blur="input_card" id="id_card"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="出生日期：" prop="birth_date">
+                    <el-input v-model="nurseData.birth_date" disabled></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="年龄：" prop="age">
+                    <el-input v-model="nurseData.age" disabled></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="层级：" prop="lavel">
+                    <el-select v-model="nurseData.level">
+                        <el-option v-for="item in levels" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="民族：" prop="nation">
+                    <el-input v-model.trim="nurseData.nation"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="职前学历：" prop="pre_education">
+                    <el-select v-model="nurseData.pre_education">
+                        <el-option v-for="item in education" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="职前毕业学校：" prop="pre_school">
+                    <el-input v-model.trim="nurseData.pre_school"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="职前毕业时间：" prop="pre_graduate_day">
+                    <el-date-picker v-model="nurseData.pre_graduate_day" type="date"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="专业：" prop="pre_professional">
+                    <el-input v-model.trim="nurseData.pre_professional"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="最高学历：" prop="top_education">
+                    <el-select v-model="nurseData.top_education">
+                        <el-option v-for="item in education" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="职后毕业学校：" prop="post_school">
+                    <el-input v-model.trim="nurseData.post_school"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="毕业时间：" prop="post_graduate_day">
+                    <el-date-picker v-model="nurseData.post_graduate_day" type="date"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="专业：" prop="post_professional">
+                    <el-input v-model.trim="nurseData.post_professional"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="参加工作时间：" prop="firstjob_day">
+                    <el-date-picker v-model="nurseData.firstjob_day" type="date"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="调入医院时间：" prop="enter_hospital_day">
+                    <el-date-picker v-model="nurseData.enter_hospital_day" type="date"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="最高职称：" prop="top_title">
+                    <el-select v-model="nurseData.top_title">
+                        <el-option v-for="item in titles" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="获得日期：" prop="get_date">
+                    <el-date-picker v-model="nurseData.get_date" type="date"></el-date-picker>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="季末：" prop="end_season">
+                    <el-date-picker v-model="nurseData.end_season" type="date"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="工作年限：" prop="work_time">
+                    <el-input-number v-model="nurseData.work_time" :precision="2" :step="1"></el-input-number>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="工作年限分界：" prop="work_time_divide">
+                    <el-input v-model.trim="nurseData.work_time_divide"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="片区：" prop="area">
+                    <el-select v-model="nurseData.area">
+                        <el-option v-for="item in areas" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="岗位1：" prop="post1">
+                    <el-select v-model="nurseData.post1">
+                        <el-option v-for="item in post1s" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="岗位2：" prop="posts2">
+                    <el-select v-model="nurseData.posts2">
+                        <el-option v-for="item in post2s" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="身份：" prop="status">
+                    <el-select v-model="nurseData.status">
+                        <el-option v-for="item in status" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="3" :offset="8">
+                <el-button type='primary' @click="addNurse" style="width:200px;font-size:20px">提交</el-button>
+            </el-col>
+            <el-col :span="3" :offset="1">
+                <el-button type="primary" @click="resetForm" style="width:200px;font-size:20px">重置</el-button>
+            </el-col>
+        </el-row>
+    </el-form>
+{% endblock %}
+
+{% block script %}
+    new Vue({
+        el: '#app',
+        delimiters: ['{[', ']}'],
+        data: {
+            nickname: JSON.parse(window.sessionStorage.getItem('user_info')).nickname,
+            nurseData: {
+                emp_sn: '',
+                name: '',
+                sex: '0',
+                dept_id: '',
+                native: '',
+                id_card: '',
+                birth_date: '',
+                age: '',
+                level: '',
+                nation: '',
+                pre_education: '',
+                pre_school: '',
+                pre_graduate_day: '',
+                pre_professional: '',
+                top_education: '',
+                post_school: '',
+                post_graduate_day: '',
+                post_professional: '',
+                firstjob_day: '',
+                enter_hospital_day: '',
+                top_title: '',
+                get_date: '',
+                end_season: '',
+                work_time: 0,
+                work_time_divide: '',
+                area: '',
+                post1: '',
+                post2: '',
+                status: '',
+            },
+            depts: {},
+            sexOption: [{value: '1', label: '男'}, {value: '0', label: '女'}],
+            levels: ['N0','N1','N2','N3','N4'],
+            education: ['中专', '大专', '本科', '硕士', '博士'],
+            titles: ['护士','护师','主管护师','副主任护师','主任护师'],
+            areas: ['护理部','外科片区','内科片区','综合片区','其他'],
+            post1s: ['护理岗位','非护理岗位'],
+            post2s: ['病区护士','非病区护士','其他'],
+            status: ['有编在岗','聘用','退休','离职'],
+            addFormRules: {
+                emp_sn: [
+                    {required: true, message: '请输入工号', trigger: 'blur'},
+                    {pattern: /^\d+$/, message:'工号必须为数字值', trigger: 'blur'},
+                ],
+                name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
+                id_card: [{pattern: /^\d{17}\w$/, message: '身份证格式错误', trigger: 'blur'}],
+            },
+        },
+        methods: {
+            get_depts(){
+                axios({
+                    method: 'get',
+                    url: '{{ url_for(".get_dept") }}'
+                }).then(response =>{
+                    if(response.data.code == 0){
+                        this.depts = response.data.data
+                    }else{
+                        this.$message.error('获取科室列表失败')
+                    }
+                }).catch(response => {
+                    this.$message.error('获取科室列表失败')
+                })
+            },
+            input_card(){
+                let id_card = this.nurseData.id_card
+                let reg = /^\d{17}\w$/
+                if(reg.test(id_card)){
+                    let birth_str = id_card.slice(6,14)
+                    let year = birth_str.substring(0,4)
+                    let month = birth_str.substring(4,6)
+                    let day = birth_str.substring(6)
+                    this.nurseData.birth_date = year + '-' + month + '-' + day
+                }else{
+                    this.nurseData.birth_date = ''
+                    this.nurseData.age = ''
+                }
+            },
+            addNurse(){
+                this.$refs.nurseDataForm.validate(valid =>{
+                    console.log(this.nurseData)
+                    if(valid){
+                        console.log(this.nurseData)
+                    }else{
+                        console.log('数据验证错误')
+                    }
+                })
+            },
+            resetForm(){
+                this.$refs['nurseDataForm'].resetFields()
+            },
+        },
+        mounted(){
+            this.get_depts()
+        }
+    })
+{% endblock %}
