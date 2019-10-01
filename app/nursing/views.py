@@ -16,6 +16,7 @@ huli = Blueprint('huli', __name__)
 def home():
     return redirect(url_for('.index'))
 
+'''登陆'''
 @huli.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'GET':
@@ -53,7 +54,19 @@ def login():
 def index():
     return render_template('index1.html')
 
-@huli.route('/get_nurse')
+'''获取科室列表'''
+@huli.route('/get_dept', methods=['GET'])
+def get_dept():
+    depts = Dept.query.all()
+    data = []
+    for item in depts:
+        id = item.id
+        name = item.dept_name
+        data.append({'id': id, 'name': name})
+    return jsonify({'code': 0, 'data': data})
+
+'''获取护士基本信息列表'''
+@huli.route('/get_nurses', methods=['GET'])
 def get_nurses():
     nurses = Nurse.query.all()
     data = []
@@ -65,11 +78,21 @@ def get_nurses():
         data.append({'emp_sn': emp_sn, 'name': name, 'sex': sex, 'dept': dept})
     return jsonify({'code': 0, 'data': data})
 
+
+'''获取护士详细信息'''
+@huli.route('/get_nurse/<emp_sn>', methods=['GET'])
+def get_nurse(emp_sn):
+    pass
+
+'''添加护士'''
 @huli.route('/add_nurse', methods=['GET', 'POST'])
 def add_nurse():
     if request.method == 'GET':
         return render_template('addNurse.html')
+    data = request.get_json()
+    print(data)
 
+'''删除护士'''
 @huli.route('/del_nurse', methods=['POST'])
 def del_nurse():
     data = request.get_json()
@@ -84,14 +107,5 @@ def del_nurse():
         return jsonify({'code': 10003, 'msg': '删除失败'})
 
 
-@huli.route('/get_dept', methods=['GET'])
-def get_dept():
-    depts = Dept.query.all()
-    data = []
-    for item in depts:
-        id = item.id
-        name = item.dept_name
-        data.append({'id': id, 'name': name})
-    return jsonify({'code': 0, 'data': data})
 
 
