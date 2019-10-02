@@ -11,7 +11,7 @@ class Nurse(db.Model):
     name = db.Column(db.String(32), nullable=False)     #姓名
     sex = db.Column(db.Integer)                         #性别,男1女0
     id_card = db.Column(db.String(18))                  #身份证号码
-    dept_id = db.Column(db.String(16), db.ForeignKey('dept.id'))    #科室id
+    dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))    #科室id
     level = db.Column(db.String(16))                    #层级
     birth_date = db.Column(db.Date)                     #出生日期
     age = db.Column(db.Float)                           #年龄

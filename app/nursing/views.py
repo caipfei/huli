@@ -29,7 +29,6 @@ def login():
             alert_show = 'false'
         return render_template('login.html', alert_msg=alert_msg, alert_show=alert_show)
     else:
-        # return '', 400
         data = request.get_json()
         username = data['username']
         password = data['password']
@@ -74,13 +73,13 @@ def get_nurses():
         emp_sn = item.emp_sn
         name = item.name
         sex = '' if item.sex == None else ('男' if item.sex == 1 else '女')
-        dept = item.dept.dept_name
+        dept = item.dept.dept_name if item.dept else None
         data.append({'emp_sn': emp_sn, 'name': name, 'sex': sex, 'dept': dept})
     return jsonify({'code': 0, 'data': data})
 
 
 '''获取护士详细信息'''
-@huli.route('/get_nurse/<emp_sn>', methods=['GET'])
+@huli.route('/get_nurse/<emp_sn>', methods=['GET', 'POST'])
 def get_nurse(emp_sn):
     pass
 
@@ -91,6 +90,18 @@ def add_nurse():
         return render_template('addNurse.html')
     data = request.get_json()
     print(data)
+    emp_sn = data['emp_sn']
+    if Nurse.query.filter_by(emp_sn=emp_sn).all():
+        return jsonify({'code': 10003, 'msg': '工号为%s的人员已存在' % emp_sn})
+    nurse = Nurse(**data)
+    try:
+        db.session.add(nurse)
+        db.session.commit()
+        return jsonify({'code': 0})
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        return jsonify({'code': 10004, 'msg': str(e)})
 
 '''删除护士'''
 @huli.route('/del_nurse', methods=['POST'])
@@ -104,7 +115,7 @@ def del_nurse():
     except Exception as e:
         print(e)
         db.session.rollback()
-        return jsonify({'code': 10003, 'msg': '删除失败'})
+        return jsonify({'code': 10005, 'msg': '删除失败'})
 
 
 

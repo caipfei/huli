@@ -190,7 +190,7 @@
         </el-row>
         <el-row type="flex">
             <el-col :span="3" :offset="8">
-                <el-button type='primary' @click="addNurse" style="width:200px;font-size:20px">提交</el-button>
+                <el-button type='primary' @click="addNurse" style="width:200px;font-size:20px" :loading="submiting">提交</el-button>
             </el-col>
             <el-col :span="3" :offset="1">
                 <el-button type="primary" @click="resetForm" style="width:200px;font-size:20px">重置</el-button>
@@ -206,45 +206,46 @@
         data: {
             nickname: JSON.parse(window.sessionStorage.getItem('user_info')).nickname,
             nurseData: {
-                emp_sn: '',
-                name: '',
+                emp_sn: null,
+                name: null,
                 sex: '0',
-                dept_id: '',
-                native: '',
-                id_card: '',
-                birth_date: '',
-                age: '',
-                level: '',
-                nation: '',
-                pre_education: '',
-                pre_school: '',
-                pre_graduate_day: '',
-                pre_professional: '',
-                top_education: '',
-                post_school: '',
-                post_graduate_day: '',
-                post_professional: '',
-                firstjob_day: '',
-                enter_hospital_day: '',
-                top_title: '',
-                get_date: '',
-                end_season: '',
-                work_time: 0,
-                work_time_divide: '',
-                area: '',
-                post1: '',
-                post2: '',
-                status: '',
+                dept_id: null,
+                native: null,
+                id_card: null,
+                birth_date: null,
+                age: null,
+                level: null,
+                nation: null,
+                pre_education: null,
+                pre_school: null,
+                pre_graduate_day: null,
+                pre_professional: null,
+                top_education: null,
+                post_school: null,
+                post_graduate_day: null,
+                post_professional: null,
+                firstjob_day: null,
+                enter_hospital_day: null,
+                top_title: null,
+                get_date: null,
+                end_season: null,
+                work_time: null,
+                work_time_divide: null,
+                area: null,
+                post1: null,
+                post2: null,
+                status: null,
             },
             depts: {},
             sexOption: [{value: '1', label: '男'}, {value: '0', label: '女'}],
-            levels: ['N0','N1','N2','N3','N4'],
+            levels: ['N0','N1','N2','N3','N4','护士长','未分层'],
             education: ['中专', '大专', '本科', '硕士', '博士'],
             titles: ['护士','护师','主管护师','副主任护师','主任护师'],
             areas: ['护理部','外科片区','内科片区','综合片区','其他'],
             post1s: ['护理岗位','非护理岗位'],
             post2s: ['病区护士','非病区护士','其他'],
             status: ['有编在岗','聘用','退休','离职'],
+            submiting: false,
             addFormRules: {
                 emp_sn: [
                     {required: true, message: '请输入工号', trigger: 'blur'},
@@ -285,9 +286,28 @@
             },
             addNurse(){
                 this.$refs.nurseDataForm.validate(valid =>{
-                    console.log(this.nurseData)
                     if(valid){
-                        console.log(this.nurseData)
+                        this.submiting = true
+                        axios({
+                            method: 'post',
+                            url: '{{ url_for('.add_nurse') }}',
+                            data: this.nurseData
+                        }).then(response => {
+                            console.log(response.data)
+                            if(response.data.code == 0){
+                                this.$message.success('添加成功')
+                                this.$refs['nurseDataForm'].resetFields()
+                            }else{
+                                this.$message({
+                                    type: 'error',
+                                    message: '添加失败，错误信息:' + response.data.msg,
+                                    showClose: true
+                                })
+                            }
+                        }).catch(response => {
+                            this.$message.error('请求失败，请稍后重试或联系管理员')
+                        })
+                        this.submiting = false
                     }else{
                         console.log('数据验证错误')
                     }
