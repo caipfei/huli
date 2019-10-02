@@ -6,6 +6,12 @@
     .el-table{
         min-height:350px;
     }
+    .el-table__body tr.current-row>td {
+        background-color: #ffec8b;
+    }
+    .el-table--enable-row-hover .el-table__body tr:hover>td{
+        background-color: #9FB6CD;
+    }
 {% endblock %}
 
 {% block  main %}
@@ -18,10 +24,15 @@
         <el-button type="primary" icon="el-icon-upload" size="medium" @click="">批量导入</el-button>
         <el-button type="primary" icon="el-icon-refresh" size="medium" @click="refresh_table">刷新列表</el-button>
     </div>
-    <el-table :data="page_data" ref="nurseList" :header-cell-style="{background:'#eef1f6',color:'#606266'}" v-loading="loading" element-loading-text="数据加载中"
+    <el-table :data="page_data" ref="nurseList" :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+          v-loading="loading" element-loading-text="数据加载中" highlight-current-row
          :default-sort="{prop: sort_prop, order: sort_order}" @sort-change="handleSortChange">
         <el-table-column type="selection" width="60px" align="center"></el-table-column>
-        <el-table-column prop="emp_sn" label="工号" sortable="custom"></el-table-column>
+        <el-table-column prop="emp_sn" label="工号" sortable="custom">
+            <template slot-scope="scope">
+                <a :href="'/huli/get_nurse/'+ scope.row.emp_sn">{[ scope.row.emp_sn ]}</a>
+            </template>
+        </el-table-column>
         <el-table-column prop="name" label="姓名" sortable="custom"></el-table-column>
         <el-table-column prop="sex" label="性别" sortable="custom"></el-table-column>
         <el-table-column prop="dept" label="科室" sortable="custom"></el-table-column>
