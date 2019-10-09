@@ -57,7 +57,7 @@
                 </el-form-item>
             </el-col>
             <el-col :span="4">
-                <el-form-item label="层级：" prop="lavel">
+                <el-form-item label="层级：" prop="level">
                     <el-select v-model="nurseData.level">
                         <el-option v-for="item in levels" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
@@ -200,6 +200,7 @@
 {% endblock %}
 
 {% block script %}
+    axios.defaults.withCredentials=true;
     new Vue({
         el: '#app',
         delimiters: ['{[', ']}'],
@@ -238,7 +239,7 @@
             },
             depts: {},
             sexOption: [{value: '1', label: '男'}, {value: '0', label: '女'}],
-            levels: ['N0','N1','N2','N3','N4','护士长','未分层'],
+            levels: ['N0','N1','N2','N3','N4','护士长','未分层','护理部','离职','其他'],
             education: ['中专', '大专', '本科', '硕士', '博士'],
             titles: ['护士','护师','主管护师','副主任护师','主任护师'],
             areas: ['护理部','外科片区','内科片区','综合片区','其他'],

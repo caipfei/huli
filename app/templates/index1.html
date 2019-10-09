@@ -21,7 +21,11 @@
         <el-button type="primary" icon="el-icon-search" size="medium" @click="handleSearch">查询</el-button>
         <el-button type="primary" icon="el-icon-plus" size="medium" @click="add_nurse">添加</el-button>
         <el-button type="primary" icon="el-icon-delete" size="medium" @click="del_nurse">删除</el-button>
-        <el-button type="primary" icon="el-icon-upload" size="medium" @click="">批量导入</el-button>
+        <el-upload style="display:inline;margin:0 10px;" action="/huli/upload_nurse" class="upload-demo"
+            list-type="text" :show-file-list="false" :before-upload="beforeUpload" :on-progress="uploadProgress"
+            :on-success="uploadSuccess" :on-error="uploadError">
+            <el-button type="primary" icon="el-icon-upload" size="medium" @click="">批量导入</el-button>
+        </el-upload>
         <el-button type="primary" icon="el-icon-refresh" size="medium" @click="refresh_table">刷新列表</el-button>
     </div>
     <el-table :data="page_data" ref="nurseList" :header-cell-style="{background:'#eef1f6',color:'#606266'}"
@@ -51,6 +55,7 @@
 {% endblock %}
 
 {% block script %}
+axios.defaults.withCredentials=true;
 new Vue({
     el: '#app',
     delimiters: ['{[', ']}'],
@@ -66,7 +71,8 @@ new Vue({
         pageSize: 20,
         total: 0,
         total_page: 0,
-        page_data: []
+        page_data: [],
+        loadObject: null,
     },
     methods: {
         get_nurses(){
@@ -133,6 +139,53 @@ new Vue({
             }).catch(response => {
                 this.$message.error('删除失败')
             })
+        },
+        beforeUpload(file){
+            let filetype = file.type
+            console.log(filetype)
+            types = [
+                'application/vnd.ms-excel',
+                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+            ]
+            if(types.indexOf(filetype) == -1){
+                this.$message({
+                    type: 'error',
+                    message: '文件类型不正确，请重新选择',
+                    showClose: true
+                })
+                return false
+            }else{
+                return true
+            }
+        },
+        uploadProgress(){
+            this.loadObject = this.$loading({
+                lock: true,
+                text: '正在导入，请稍候',
+                spinner: 'el-icon-loading',
+                background: 'rgba(0,0,0,0.7)'
+            })
+        },
+        uploadSuccess(res, file){
+            console.log(res)
+            console.log(file)
+            this.loadObject.close()
+            if(res['code'] != 0){
+                this.$message({
+                    type: 'error',
+                    message: res['msg'],
+                    showClose: true
+                })
+            }else{
+                this.$message.success('导入成功')
+                this.get_nurses()
+            }
+        },
+        uploadError(res, file){
+            console.log(res)
+            console.log(file)
+            this.loadObject.close()
+            this.$message.error('导入失败，请稍后重试')
         },
         refresh_table(){
             this.loading = true
