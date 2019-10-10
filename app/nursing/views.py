@@ -82,7 +82,8 @@ def get_nurses():
 '''获取护士详细信息'''
 @huli.route('/get_nurse/<emp_sn>', methods=['GET', 'POST'])
 def get_nurse(emp_sn):
-    pass
+    nurse = Nurse.query.filter_by(emp_sn=emp_sn).first()
+    return jsonify(nurse.__dict__)
 
 '''添加护士'''
 @huli.route('/add_nurse', methods=['GET', 'POST'])
@@ -121,67 +122,74 @@ def uplosd_nurse():
         return jsonify({'code': 1005, 'msg': '数据表格式不正确'})
     # print(table.row_values(0))
     # print(table.row_values(1))
-    print(table.row_values(3))
-    print(table.cell(3, 7).ctype)
-    print(table.cell(3, 13).ctype)
-    d = datetime(*xlrd.xldate_as_tuple(table.cell_value(3, 13), 0))
-    print(d.strftime('%Y/%m/%d'))
+    # print(table.row_values(3))
+    # print(table.cell(3, 7).ctype)
+    # print(table.cell(3, 13).ctype)
+    # d = datetime(*xlrd.xldate_as_tuple(table.cell_value(3, 13), 0))
+    # print(d.strftime('%Y/%m/%d'))
     total = nrows - 2
     error_count = 0
     for i in range(2, nrows):
-        row_data = table.row_values(i)
-        emp_sn = row_data[2]
-        nurse = Nurse.query.filter_by(emp_sn=emp_sn).first()
-        if nurse:
+        try:
+            row_data = table.row_values(i)
+            emp_sn = row_data[2]
+            nurse = Nurse.query.filter_by(emp_sn=emp_sn).first()
+            if nurse:
+                error_count += 1
+                continue
+            name = row_data[3]
+            dept_name = row_data[1]
+            dept = Dept.query.filter_by(dept_name=dept_name).first()
+            if dept:
+                dept_id = dept.id
+            else:
+                dept = Dept(dept_name=dept_name)
+                db.session.add(dept)
+                db.session.flush()
+                db.session.commit()
+                dept_id = dept.id
+            sex = 1 if row_data[5] == '男' else 0
+            level = row_data[4]
+            id_card = row_data[6].strip('\u3000')
+            birth_date = datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 7), 0)).strftime('%Y-%m-%d') if table.cell(i, 7).ctype == 3 else row_data[7]
+            age = round(row_data[8], 1) if row_data[8] else None
+            native = row_data[9]
+            nation = row_data[10]
+            pre_education = row_data[11]
+            pre_school = row_data[12]
+            pre_graduate_day = datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 13), 0)).strftime('%Y/%m/%d') if table.cell(i, 13).ctype == 3 else row_data[13]
+            pre_professional = row_data[14]
+            top_education = row_data[15]
+            post_school = row_data[16]
+            post_graduate_day = datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 17), 0)).strftime('%Y/%m/%d') if table.cell(i, 17).ctype == 3 else row_data[17]
+            post_professional = row_data[18]
+            firstjob_day = row_data[19] if table.cell(i, 19).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 19), 0)).strftime('%Y/%m/%d')
+            enter_hospital_day = row_data[20] if table.cell(i, 20).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 20), 0)).strftime('%Y/%m/%d')
+            top_title = row_data[21]
+            get_date = row_data[22] if table.cell(i, 22).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 22), 0)).strftime('%Y/%m/%d')
+            end_season = row_data[23] if table.cell(i, 23).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 23), 0)).strftime('%Y/%m/%d')
+            work_time = round(row_data[24], 2) if row_data[24] else None
+            work_time_divide = row_data[25]
+            area = row_data[26]
+            post1 = row_data[27]
+            post2 = row_data[28]
+            status = row_data[29]
+            nurse_data = {'emp_sn': emp_sn, 'name': name, 'sex': sex, 'id_card': id_card, 'dept_id': dept_id, 'level': level, 'birth_date': birth_date, 'age': age,
+                          'native': native, 'nation': nation, 'pre_education': pre_education, 'pre_school': pre_school, 'pre_graduate_day': pre_graduate_day,
+                          'pre_professional': pre_professional, 'top_education': top_education, 'post_school': post_school, 'post_graduate_day': post_graduate_day,
+                          'post_professional': post_professional, 'firstjob_day': firstjob_day, 'enter_hospital_day': enter_hospital_day, 'top_title': top_title,
+                          'get_date': get_date, 'end_season': end_season, 'work_time': work_time, 'work_time_divide': work_time_divide, 'area': area, 'post1': post1,
+                          'post2': post2, 'status': status}
+            nurse = Nurse(**nurse_data)
+            db.session.add(nurse)
+            db.session.commit()
+        except Exception as e:
+            print(e)
+            # print(emp_sn)
+            db.session.rollback()
             error_count += 1
             continue
-        name = row_data[3]
-        dept_name = row_data[1]
-        dept = Dept.query.filter_by(dept_name=dept_name).first()
-        if dept:
-            dept_id = dept.id
-        else:
-            dept = Dept(dept_name=dept_name)
-            db.session.commit(dept)
-            db.session.flush()
-            db.session.commit()
-            dept_id = dept.id
-        sex = 1 if row_data[5] == '男' else 0
-        level = row_data[4]
-        id_card = row_data[6]
-        birth_date = datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 7), 0)).strftime('%Y-%m-%d') if table.cell(i, 7).ctype == 3 else row_data[7]
-        age = row_data[8]
-        native = row_data[9]
-        nation = row_data[10]
-        pre_education = row_data[11]
-        pre_school = row_data[12]
-        pre_graduate_day = datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 13), 0)).strftime('%Y/%m/%d') if table.cell(i, 13).ctype == 3 else row_data[13]
-        pre_professional = row_data[14]
-        top_education = row_data[15]
-        post_school = row_data[16]
-        post_graduate_day = datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 17), 0)).strftime('%Y/%m/%d') if table.cell(i, 17).ctype==3 else row_data[17]
-        post_professional = row_data[18]
-        firstjob_day = row_data[19] if table.cell(i, 19).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 19), 0)).strftime('%Y/%m/%d')
-        enter_hospital_day = row_data[20] if table.cell(i, 20).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 20), 0)).strftime('%Y/%m/%d')
-        top_title = row_data[21]
-        get_date = row_data[22] if table.cell(i, 22).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 22), 0)).strftime('%Y/%m/%d')
-        end_season = row_data[23] if table.cell(i, 23).ctype != 3 else datetime(*xlrd.xldate_as_tuple(table.cell_value(i, 23), 0)).strftime('%Y/%m/%d')
-        work_time = row_data[24]
-        work_time_divide = row_data[25]
-        area = row_data[26]
-        post1 = row_data[27]
-        post2 = row_data[28]
-        status = row_data[29]
-        nurse_data = {'emp_sn': emp_sn, 'name': name, 'sex': sex, 'id_card': id_card, 'dept_id': dept_id, 'level': level, 'birth_date': birth_date, 'age': age,
-                      'native': native, 'nation': nation, 'pre_education': pre_education, 'pre_school': pre_school, 'pre_graduate_day': pre_graduate_day,
-                      'pre_professional': pre_professional, 'top_education': top_education, 'post_school': post_school, 'post_graduate_day': post_graduate_day,
-                      'post_professional': post_professional, 'firstjob_day': firstjob_day, 'enter_hospital_day': enter_hospital_day, 'top_title': top_title,
-                      'get_date': get_date, 'end_season': end_season, 'work_time': work_time, 'work_time_divide': work_time_divide, 'area': area, 'post1': post1,
-                      'post2': post2, 'status': status}
-        nurse = Nurse(**nurse_data)
-        db.session.add(nurse)
-    db.session.commit()
-    return jsonify({'code': 0})
+    return jsonify({'code': 0, 'total': total, 'error_count': error_count, 'success_count': total-error_count})
 
 '''删除护士'''
 @huli.route('/del_nurse', methods=['POST'])
