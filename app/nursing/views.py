@@ -83,7 +83,7 @@ def get_nurses():
 @huli.route('/get_nurse/<emp_sn>', methods=['GET', 'POST'])
 def get_nurse(emp_sn):
     nurse = Nurse.query.filter_by(emp_sn=emp_sn).first()
-    return jsonify(nurse.__dict__)
+    return jsonify(nurse.to_dict())
 
 '''添加护士'''
 @huli.route('/add_nurse', methods=['GET', 'POST'])

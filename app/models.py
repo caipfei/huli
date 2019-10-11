@@ -37,6 +37,16 @@ class Nurse(db.Model):
     post2 = db.Column(db.String(32))                    #岗位2
     status = db.Column(db.String(32))                   #身份
 
+    def to_dict(self):
+        return {'emp_sn': self.emp_sn, 'name': self.name, 'sex': self.sex, 'id_card': self.id_card, 'dept_id': self.dept_id,
+                'level': self.level, 'birth_date': self.birth_date, 'age': self.age, 'native': self.native, 'nation': self.nation,
+                'pre_education': self.pre_education, 'pre_school': self.pre_school, 'pre_graduate_day': self.pre_graduate_day,
+                'pre_professional': self.pre_professional, 'top_education': self.top_education, 'post_school': self.post_school,
+                'post_graduate_day': self.post_graduate_day, 'post_professional': self.post_professional, 'firstjob_day': self.firstjob_day,
+                'enter_hospital_day': self.enter_hospital_day, 'top_title': self.top_title, 'get_date': self.get_date,
+                'end_season': self.end_season, 'work_time': self.work_time, 'work_time_divide': self.work_time_divide, 'area': self.area,
+                'post1': self.post1, 'post2': self.post2, 'status': self.status}
+
 
 class Dept(db.Model):
     __tablename__ = 'dept'
