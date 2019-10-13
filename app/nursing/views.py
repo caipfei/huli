@@ -65,7 +65,7 @@ def get_dept():
         data.append({'id': id, 'name': name})
     return jsonify({'code': 0, 'data': data})
 
-'''获取护士基本信息列表'''
+'''获取护士列表'''
 @huli.route('/get_nurses', methods=['GET'])
 def get_nurses():
     nurses = Nurse.query.all()
@@ -83,7 +83,10 @@ def get_nurses():
 @huli.route('/get_nurse/<emp_sn>', methods=['GET', 'POST'])
 def get_nurse(emp_sn):
     nurse = Nurse.query.filter_by(emp_sn=emp_sn).first()
-    return jsonify(nurse.to_dict())
+    if nurse:
+        return jsonify({'code': 0, 'data': nurse.to_dict()})
+    else:
+        return jsonify({'code': 10006, 'msg': '未查到工号为%s的护士' % emp_sn})
 
 '''添加护士'''
 @huli.route('/add_nurse', methods=['GET', 'POST'])
@@ -204,6 +207,13 @@ def del_nurse():
         print(e)
         db.session.rollback()
         return jsonify({'code': 10005, 'msg': '删除失败'})
+
+@huli.route('/update_nurse/<emp_sn>', methods=['GET', 'POST'])
+def update_nurse(emp_sn):
+    if request.method == 'GET':
+        return render_template('detail.html', emp_sn=emp_sn)
+    else:
+        return ''
 
 
 

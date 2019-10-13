@@ -38,13 +38,21 @@ class Nurse(db.Model):
     status = db.Column(db.String(32))                   #身份
 
     def to_dict(self):
+        birth_date = self.birth_date.strftime('%Y-%m-%d') if self.birth_date else None
+        pre_graduate_day = self.pre_graduate_day.strftime('%Y-%m-%d') if self.pre_graduate_day else None
+        post_graduate_day = self.post_graduate_day.strftime('%Y-%m-%d') if self.post_graduate_day else None
+        firstjob_day = self.firstjob_day.strftime('%Y-%m-%d') if self.firstjob_day else None
+        enter_hospital_day = self.enter_hospital_day.strftime('%Y-%m-%d') if self.enter_hospital_day else None
+        get_date = self.get_date.strftime('%Y-%m-%d') if self.get_date else None
+        end_season = self.end_season.strftime('%Y-%m-%d') if self.end_season else None
         return {'emp_sn': self.emp_sn, 'name': self.name, 'sex': self.sex, 'id_card': self.id_card, 'dept_id': self.dept_id,
-                'level': self.level, 'birth_date': self.birth_date, 'age': self.age, 'native': self.native, 'nation': self.nation,
-                'pre_education': self.pre_education, 'pre_school': self.pre_school, 'pre_graduate_day': self.pre_graduate_day,
-                'pre_professional': self.pre_professional, 'top_education': self.top_education, 'post_school': self.post_school,
-                'post_graduate_day': self.post_graduate_day, 'post_professional': self.post_professional, 'firstjob_day': self.firstjob_day,
-                'enter_hospital_day': self.enter_hospital_day, 'top_title': self.top_title, 'get_date': self.get_date,
-                'end_season': self.end_season, 'work_time': self.work_time, 'work_time_divide': self.work_time_divide, 'area': self.area,
+                'level': self.level, 'birth_date': birth_date, 'age': self.age, 'native': self.native,
+                'nation': self.nation,'pre_education': self.pre_education, 'pre_school': self.pre_school,
+                'pre_graduate_day': pre_graduate_day, 'pre_professional': self.pre_professional,
+                'top_education': self.top_education, 'post_school': self.post_school,'post_graduate_day': post_graduate_day,
+                'post_professional': self.post_professional, 'firstjob_day': firstjob_day,
+                'enter_hospital_day': enter_hospital_day, 'top_title': self.top_title, 'get_date': get_date,
+                'end_season': end_season, 'work_time': self.work_time, 'work_time_divide': self.work_time_divide, 'area': self.area,
                 'post1': self.post1, 'post2': self.post2, 'status': self.status}
 
 

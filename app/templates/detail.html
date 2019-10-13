@@ -1,0 +1,283 @@
+{% extends 'base.html' %}
+
+{% block title %}护士详细信息{% endblock %}
+
+{% block style %}
+    input[disabled="disabled"]{
+        color: #121212 !important;
+    }
+{% endblock %}
+
+{% block main %}
+    <div style="margin-bottom:20px;padding-left:20px;"><strong>添加护理人员</strong></div>
+     <el-form :model="nurseData" ref="nurseDataForm" class="demo-ruleForm" label-width="120px" :rules="addFormRules">
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="工号：" prop="emp_sn">
+                    <el-input v-model.trim="nurseData.emp_sn" :disabled="true"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="姓名：" prop="name">
+                    <el-input v-model.trim="nurseData.name" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="性别：" prop="sex">
+                    <el-select v-model="nurseData.sex" :disabled="allow_modify">
+                        <el-option v-for="item in sexOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="科室：" prop="dept_id">
+                    <el-select v-model="nurseData.dept_id" :disabled="allow_modify">
+                        <el-option v-for="item in depts" :key="item.id" :label="item.name" :value="item.id"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="籍贯：" prop="native">
+                    <el-input v-model.trim="nurseData.native" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="身份证号：" prop="id_card">
+                    <el-input v-model.trim="nurseData.id_card" @blur="input_card" id="id_card" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="出生日期：" prop="birth_date">
+                    <el-input v-model="nurseData.birth_date" disabled></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="年龄：" prop="age">
+                    <el-input v-model="nurseData.age" disabled></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="层级：" prop="level">
+                    <el-select v-model="nurseData.level" :disabled="allow_modify">
+                        <el-option v-for="item in levels" :key="item" :label="item" :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="4">
+                <el-form-item label="民族：" prop="nation">
+                    <el-input v-model.trim="nurseData.nation" :disabled="allow_modify" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="职前学历：" prop="pre_education">
+                    <el-select v-model="nurseData.pre_education" :disabled="allow_modify">
+                        <el-option v-for="item in education" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="职前毕业学校：" prop="pre_school">
+                    <el-input v-model.trim="nurseData.pre_school" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="职前毕业时间：" prop="pre_graduate_day">
+                    <el-date-picker v-model="nurseData.pre_graduate_day" type="date" :disabled="allow_modify"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="专业：" prop="pre_professional">
+                    <el-input v-model.trim="nurseData.pre_professional" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="最高学历：" prop="top_education">
+                    <el-select v-model="nurseData.top_education" :disabled="allow_modify">
+                        <el-option v-for="item in education" :key="item" :label="item" :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="职后毕业学校：" prop="post_school">
+                    <el-input v-model.trim="nurseData.post_school" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="毕业时间：" prop="post_graduate_day">
+                    <el-date-picker v-model="nurseData.post_graduate_day" type="date" :disabled="allow_modify"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="专业：" prop="post_professional">
+                    <el-input v-model.trim="nurseData.post_professional" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="参加工作时间：" prop="firstjob_day">
+                    <el-date-picker v-model="nurseData.firstjob_day" type="date" :disabled="allow_modify"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="调入医院时间：" prop="enter_hospital_day">
+                    <el-date-picker v-model="nurseData.enter_hospital_day" type="date" :disabled="allow_modify"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="最高职称：" prop="top_title">
+                    <el-select v-model="nurseData.top_title" :disabled="allow_modify">
+                        <el-option v-for="item in titles" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="获得日期：" prop="get_date">
+                    <el-date-picker v-model="nurseData.get_date" type="date" :disabled="allow_modify"></el-date-picker>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="季末：" prop="end_season">
+                    <el-date-picker v-model="nurseData.end_season" type="date" :disabled="allow_modify"></el-date-picker>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="工作年限：" prop="work_time">
+                    <el-input-number v-model="nurseData.work_time" :precision="2" :step="1" :disabled="allow_modify"></el-input-number>
+                </el-form-item>
+            </el-col>
+            <el-col :span="12">
+                <el-form-item label="工作年限分界：" prop="work_time_divide">
+                    <el-input v-model.trim="nurseData.work_time_divide" :disabled="allow_modify"></el-input>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="6">
+                <el-form-item label="片区：" prop="area">
+                    <el-select v-model="nurseData.area" :disabled="allow_modify">
+                        <el-option v-for="item in areas" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="岗位1：" prop="post1">
+                    <el-select v-model="nurseData.post1" :disabled="allow_modify">
+                        <el-option v-for="item in post1s" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="岗位2：" prop="post2">
+                    <el-select v-model="nurseData.post2" :disabled="allow_modify">
+                        <el-option v-for="item in post2s" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+            <el-col :span="6">
+                <el-form-item label="身份：" prop="status">
+                    <el-select v-model="nurseData.status" :disabled="allow_modify">
+                        <el-option v-for="item in status" :key="item" :label="item" :value="item"></el-option>
+                    </el-select>
+                </el-form-item>
+            </el-col>
+        </el-row>
+        <el-row type="flex">
+            <el-col :span="3" :offset="8">
+                <el-button type='primary' @click="" style="width:200px;font-size:20px" :loading="submiting">提交</el-button>
+            </el-col>
+            <el-col :span="3" :offset="1">
+                <el-button type="primary" @click="resetForm" style="width:200px;font-size:20px">重置</el-button>
+            </el-col>
+        </el-row>
+    </el-form>
+{% endblock %}
+
+{% block script %}
+    new Vue({
+        el: '#app',
+        delimiters: ['{[', ']}'],
+        data: {
+            nickname: JSON.parse(window.sessionStorage.getItem('user_info')).nickname,
+            emp_sn: {{ emp_sn }},
+            nurseData: {},
+            allow_modify: true,
+            depts: {},
+            sexOption: [{value: 1, label: '男'}, {value: 0, label: '女'}],
+            levels: ['N0','N1','N2','N3','N4','护士长','未分层','护理部','离职','其他'],
+            education: ['中专', '大专', '本科', '硕士', '博士'],
+            titles: ['护士','护师','主管护师','副主任护师','主任护师'],
+            areas: ['护理部','外科片区','内科片区','综合片区','其他'],
+            post1s: ['护理岗位','非护理岗位'],
+            post2s: ['病区护士','非病区护士','其他'],
+            status: ['有编在岗','聘用','退休','离职'],
+            addFormRules: {},
+            submiting: false,
+        },
+        methods: {
+            get_depts(){
+                axios({
+                    method: 'get',
+                    url: '{{ url_for(".get_dept") }}'
+                }).then(response =>{
+                    if(response.data.code == 0){
+                        this.depts = response.data.data
+                    }else{
+                        this.$message.error('获取科室列表失败')
+                    }
+                }).catch(response => {
+                    this.$message.error('获取科室列表失败')
+                })
+            },
+            input_card(){
+                let id_card = this.nurseData.id_card
+                let reg = /^\d{17}\w$/
+                if(reg.test(id_card)){
+                    let birth_str = id_card.slice(6,14)
+                    let year = birth_str.substring(0,4)
+                    let month = birth_str.substring(4,6)
+                    let day = birth_str.substring(6)
+                    this.nurseData.birth_date = year + '-' + month + '-' + day
+                    let age = getAge(this.nurseData.birth_date)
+                    this.nurseData.age = age
+                }else{
+                    this.nurseData.birth_date = null
+                    this.nurseData.age = null
+                }
+            },
+            get_nurse_detail(){
+                axios({
+                    method: 'get',
+                    url: "{{ url_for('.get_nurse', emp_sn=emp_sn) }}",
+                }).then(response => {
+                    console.log(response)
+                    if(response.data.code == 0){
+                        this.nurseData = response.data.data
+                    }else{
+                        this.$message.error(response.data.msg)
+                    }
+                }).catch(response => {
+                    console.log(response)
+                    this.$message.error('获取护士详细信息失败，请稍后重试或联系管理员')
+                })
+            },
+            resetForm(){
+                this.$refs['nurseDataForm'].resetFields()
+            },
+        },
+        mounted(){
+            this.get_depts()
+            this.get_nurse_detail()
+        }
+    })
+{% endblock %}
