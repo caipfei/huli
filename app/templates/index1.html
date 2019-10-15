@@ -34,7 +34,7 @@
         <el-table-column type="selection" width="60px" align="center"></el-table-column>
         <el-table-column prop="emp_sn" label="工号" sortable="custom">
             <template slot-scope="scope">
-                <a :href="'/huli/update_nurse/'+ scope.row.emp_sn">{[ scope.row.emp_sn ]}</a>
+                <a :href="'/huli/nurse_detail/'+ scope.row.emp_sn">{[ scope.row.emp_sn ]}</a>
             </template>
         </el-table-column>
         <el-table-column prop="name" label="姓名" sortable="custom"></el-table-column>
@@ -85,9 +85,17 @@ new Vue({
                     this.nurses = response.data.data
                     this.filter_nurses = this.nurses
                     if(this.sort_order == 'ascending'){
-                        this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})
+                        if(this.sort_prop == 'emp_sn'){
+                            this.nurses.sort((a, b) => {return a[this.sort_prop] - b[this.sort_prop]})
+                        }else{
+                            this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})
+                        }
                     }else{
-                        this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})
+                        if(this.sort_prop == 'emp_sn'){
+                            this.nurses.sort((a, b) => {return b[this.sort_prop] - a[this.sort_prop]})
+                        }else{
+                            this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})
+                        }
                     }
                     this.page_data = this.nurses.slice(0, this.pageSize)
                     this.currentPage = 1
@@ -181,7 +189,6 @@ new Vue({
                     type: 'success',
                     message:'总共'+res['total']+'条，成功'+res['success_count']+'条，失败'+res['error_count']+'条',
                     showClose: true,
-                    duration: 50000
                 })
                 this.get_nurses()
             }
@@ -216,10 +223,18 @@ new Vue({
             this.sort_order = sort_order
 
             //先根据排序规则排序
-            if(sort_order == 'ascending'){
-                this.nurses.sort((a, b) => {return a[sort_prop] > b[sort_prop]})
+            if(this.sort_order == 'ascending'){
+                if(this.sort_prop == 'emp_sn'){
+                    this.nurses.sort((a, b) => {return a[this.sort_prop] - b[this.sort_prop]})
+                }else{
+                    this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})
+                }
             }else{
-                this.nurses.sort((a,b) => {return b[sort_prop] > a[sort_prop]})
+                if(this.sort_prop == 'emp_sn'){
+                    this.nurses.sort((a, b) => {return b[this.sort_prop] - a[this.sort_prop]})
+                }else{
+                    this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})
+                }
             }
             //如果有搜索，再将数据筛选出来
             this.filter_nurses = this.nurses.filter(data => {

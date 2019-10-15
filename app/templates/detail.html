@@ -19,33 +19,33 @@
             </el-col>
             <el-col :span="6">
                 <el-form-item label="姓名：" prop="name">
-                    <el-input v-model.trim="nurseData.name" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.name" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
             <el-col :span="4">
                 <el-form-item label="性别：" prop="sex">
-                    <el-select v-model="nurseData.sex" :disabled="allow_modify">
+                    <el-select v-model="nurseData.sex" :disabled="forbid_edit">
                         <el-option v-for="item in sexOption" :key="item.value" :label="item.label" :value="item.value"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="4">
                 <el-form-item label="科室：" prop="dept_id">
-                    <el-select v-model="nurseData.dept_id" :disabled="allow_modify">
+                    <el-select v-model="nurseData.dept_id" :disabled="forbid_edit">
                         <el-option v-for="item in depts" :key="item.id" :label="item.name" :value="item.id"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="4">
                 <el-form-item label="籍贯：" prop="native">
-                    <el-input v-model.trim="nurseData.native" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.native" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
         </el-row>
         <el-row type="flex">
             <el-col :span="6">
                 <el-form-item label="身份证号：" prop="id_card">
-                    <el-input v-model.trim="nurseData.id_card" @blur="input_card" id="id_card" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.id_card" @blur="input_card" id="id_card" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
@@ -60,7 +60,7 @@
             </el-col>
             <el-col :span="4">
                 <el-form-item label="层级：" prop="level">
-                    <el-select v-model="nurseData.level" :disabled="allow_modify">
+                    <el-select v-model="nurseData.level" :disabled="forbid_edit">
                         <el-option v-for="item in levels" :key="item" :label="item" :value="item">
                         </el-option>
                     </el-select>
@@ -68,38 +68,38 @@
             </el-col>
             <el-col :span="4">
                 <el-form-item label="民族：" prop="nation">
-                    <el-input v-model.trim="nurseData.nation" :disabled="allow_modify" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.nation" :disabled="forbid_edit" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
         </el-row>
         <el-row type="flex">
             <el-col :span="6">
                 <el-form-item label="职前学历：" prop="pre_education">
-                    <el-select v-model="nurseData.pre_education" :disabled="allow_modify">
+                    <el-select v-model="nurseData.pre_education" :disabled="forbid_edit">
                         <el-option v-for="item in education" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="职前毕业学校：" prop="pre_school">
-                    <el-input v-model.trim="nurseData.pre_school" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.pre_school" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="职前毕业时间：" prop="pre_graduate_day">
-                    <el-date-picker v-model="nurseData.pre_graduate_day" type="date" :disabled="allow_modify"></el-date-picker>
+                    <el-date-picker v-model="nurseData.pre_graduate_day" type="date" :disabled="forbid_edit"></el-date-picker>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="专业：" prop="pre_professional">
-                    <el-input v-model.trim="nurseData.pre_professional" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.pre_professional" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
         </el-row>
         <el-row type="flex">
             <el-col :span="6">
                 <el-form-item label="最高学历：" prop="top_education">
-                    <el-select v-model="nurseData.top_education" :disabled="allow_modify">
+                    <el-select v-model="nurseData.top_education" :disabled="forbid_edit">
                         <el-option v-for="item in education" :key="item" :label="item" :value="item">
                         </el-option>
                     </el-select>
@@ -107,86 +107,86 @@
             </el-col>
             <el-col :span="6">
                 <el-form-item label="职后毕业学校：" prop="post_school">
-                    <el-input v-model.trim="nurseData.post_school" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.post_school" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="毕业时间：" prop="post_graduate_day">
-                    <el-date-picker v-model="nurseData.post_graduate_day" type="date" :disabled="allow_modify"></el-date-picker>
+                    <el-date-picker v-model="nurseData.post_graduate_day" type="date" :disabled="forbid_edit"></el-date-picker>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="专业：" prop="post_professional">
-                    <el-input v-model.trim="nurseData.post_professional" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.post_professional" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
         </el-row>
         <el-row type="flex">
             <el-col :span="6">
                 <el-form-item label="参加工作时间：" prop="firstjob_day">
-                    <el-date-picker v-model="nurseData.firstjob_day" type="date" :disabled="allow_modify"></el-date-picker>
+                    <el-date-picker v-model="nurseData.firstjob_day" type="date" :disabled="forbid_edit"></el-date-picker>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="调入医院时间：" prop="enter_hospital_day">
-                    <el-date-picker v-model="nurseData.enter_hospital_day" type="date" :disabled="allow_modify"></el-date-picker>
+                    <el-date-picker v-model="nurseData.enter_hospital_day" type="date" :disabled="forbid_edit"></el-date-picker>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="最高职称：" prop="top_title">
-                    <el-select v-model="nurseData.top_title" :disabled="allow_modify">
+                    <el-select v-model="nurseData.top_title" :disabled="forbid_edit">
                         <el-option v-for="item in titles" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="获得日期：" prop="get_date">
-                    <el-date-picker v-model="nurseData.get_date" type="date" :disabled="allow_modify"></el-date-picker>
+                    <el-date-picker v-model="nurseData.get_date" type="date" :disabled="forbid_edit"></el-date-picker>
                 </el-form-item>
             </el-col>
         </el-row>
         <el-row type="flex">
             <el-col :span="6">
                 <el-form-item label="季末：" prop="end_season">
-                    <el-date-picker v-model="nurseData.end_season" type="date" :disabled="allow_modify"></el-date-picker>
+                    <el-date-picker v-model="nurseData.end_season" type="date" :disabled="forbid_edit"></el-date-picker>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="工作年限：" prop="work_time">
-                    <el-input-number v-model="nurseData.work_time" :precision="2" :step="1" :disabled="allow_modify"></el-input-number>
+                    <el-input-number v-model="nurseData.work_time" :precision="2" :step="1" :disabled="forbid_edit"></el-input-number>
                 </el-form-item>
             </el-col>
             <el-col :span="12">
                 <el-form-item label="工作年限分界：" prop="work_time_divide">
-                    <el-input v-model.trim="nurseData.work_time_divide" :disabled="allow_modify"></el-input>
+                    <el-input v-model.trim="nurseData.work_time_divide" :disabled="forbid_edit"></el-input>
                 </el-form-item>
             </el-col>
         </el-row>
         <el-row type="flex">
             <el-col :span="6">
                 <el-form-item label="片区：" prop="area">
-                    <el-select v-model="nurseData.area" :disabled="allow_modify">
+                    <el-select v-model="nurseData.area" :disabled="forbid_edit">
                         <el-option v-for="item in areas" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="岗位1：" prop="post1">
-                    <el-select v-model="nurseData.post1" :disabled="allow_modify">
+                    <el-select v-model="nurseData.post1" :disabled="forbid_edit">
                         <el-option v-for="item in post1s" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="岗位2：" prop="post2">
-                    <el-select v-model="nurseData.post2" :disabled="allow_modify">
+                    <el-select v-model="nurseData.post2" :disabled="forbid_edit">
                         <el-option v-for="item in post2s" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
             </el-col>
             <el-col :span="6">
                 <el-form-item label="身份：" prop="status">
-                    <el-select v-model="nurseData.status" :disabled="allow_modify">
+                    <el-select v-model="nurseData.status" :disabled="forbid_edit">
                         <el-option v-for="item in status" :key="item" :label="item" :value="item"></el-option>
                     </el-select>
                 </el-form-item>
@@ -194,10 +194,11 @@
         </el-row>
         <el-row type="flex">
             <el-col :span="3" :offset="8">
-                <el-button type='primary' @click="" style="width:200px;font-size:20px" :loading="submiting">提交</el-button>
+                <el-button v-if="edit_status" type='primary' @click="updateNurse" style="width:200px;font-size:20px" :loading="submiting">提交</el-button>
+                <el-button v-else type="primary" @click="editNurse" style="width:200px;font-size:20px">编辑</el-button>
             </el-col>
             <el-col :span="3" :offset="1">
-                <el-button type="primary" @click="resetForm" style="width:200px;font-size:20px">重置</el-button>
+                <el-button type="primary" @click="resetForm" style="width:200px;font-size:20px">取消</el-button>
             </el-col>
         </el-row>
     </el-form>
@@ -211,7 +212,7 @@
             nickname: JSON.parse(window.sessionStorage.getItem('user_info')).nickname,
             emp_sn: {{ emp_sn }},
             nurseData: {},
-            allow_modify: true,
+            forbid_edit: true,
             depts: {},
             sexOption: [{value: 1, label: '男'}, {value: 0, label: '女'}],
             levels: ['N0','N1','N2','N3','N4','护士长','未分层','护理部','离职','其他'],
@@ -221,8 +222,12 @@
             post1s: ['护理岗位','非护理岗位'],
             post2s: ['病区护士','非病区护士','其他'],
             status: ['有编在岗','聘用','退休','离职'],
-            addFormRules: {},
+            addFormRules: {
+                name: [{required: true, message: '请输入姓名', trigger: 'blur'}],
+                id_card: [{pattern: /^\d{17}\w$/, message: '身份证格式错误', trigger: 'blur'}],
+            },
             submiting: false,
+            edit_status: false,
         },
         methods: {
             get_depts(){
@@ -271,8 +276,42 @@
                     this.$message.error('获取护士详细信息失败，请稍后重试或联系管理员')
                 })
             },
+            editNurse(){
+                this.edit_status = true
+                this.forbid_edit = false
+            },
+            updateNurse(){
+                this.$refs.nurseDataForm.validate(valid => {
+                    if(valid){
+                        this.submiting = true
+                        let data = {}
+                        for(let attr in this.nurseData){
+                            data[attr] = this.nurseData[attr]
+                        }
+                        delete data.emp_sn
+                        axios({
+                            method: 'post',
+                            url: "{{ url_for('.update_nurse', emp_sn=emp_sn) }}",
+                            data: data
+                        }).then(response => {
+                            if(response.data.code == 0){
+                                this.$message.success('修改成功')
+                            }else{
+                                this.$message.error('修改失败，msg：'+ response.data.msg)
+                            }
+                        }).catch(response => {
+                            this.$message.error('请求失败，请稍后重试或联系管理员')
+                        })
+                        this.submiting = false
+                    }else{
+                        console.log('数据验证错误')
+                    }
+                })
+            },
             resetForm(){
-                this.$refs['nurseDataForm'].resetFields()
+                this.get_nurse_detail()
+                this.edit_status = false
+                this.forbid_edit = true
             },
         },
         mounted(){

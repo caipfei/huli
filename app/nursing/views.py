@@ -208,12 +208,23 @@ def del_nurse():
         db.session.rollback()
         return jsonify({'code': 10005, 'msg': '删除失败'})
 
-@huli.route('/update_nurse/<emp_sn>', methods=['GET', 'POST'])
+'''获取更新护士信息'''
+@huli.route('/nurse_detail/<emp_sn>', methods=['GET', 'POST'])
 def update_nurse(emp_sn):
     if request.method == 'GET':
         return render_template('detail.html', emp_sn=emp_sn)
     else:
-        return ''
+        data = request.get_json()
+        print(data)
+        try:
+            Nurse.query.filter_by(emp_sn=emp_sn).update(data)
+            db.session.commit()
+            return jsonify({'code': 0})
+        except Exception as e:
+            print(e)
+            db.session.rollback()
+            return jsonify({'code': 10007, 'msg': str(e)})
+
 
 
 
