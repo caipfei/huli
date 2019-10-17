@@ -88,13 +88,15 @@ new Vue({
                         if(this.sort_prop == 'emp_sn'){
                             this.nurses.sort((a, b) => {return a[this.sort_prop] - b[this.sort_prop]})
                         }else{
-                            this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})
+{#                            this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})#}
+                            this.nurses.sort((a, b) => {return a[this.sort_prop].localeCompare(b[this.sort_prop],'zh-CN')})
                         }
                     }else{
                         if(this.sort_prop == 'emp_sn'){
                             this.nurses.sort((a, b) => {return b[this.sort_prop] - a[this.sort_prop]})
                         }else{
-                            this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})
+{#                            this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})#}
+                            this.nurses.sort((a,b) => {return b[this.sort_prop].localeCompare(a[this.sort_prop],'zh-CN')})
                         }
                     }
                     this.page_data = this.nurses.slice(0, this.pageSize)
@@ -227,15 +229,18 @@ new Vue({
                 if(this.sort_prop == 'emp_sn'){
                     this.nurses.sort((a, b) => {return a[this.sort_prop] - b[this.sort_prop]})
                 }else{
-                    this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})
+{#                    this.nurses.sort((a, b) => {return a[this.sort_prop] > b[this.sort_prop]})#}
+                    this.nurses.sort((a, b) => {return a[this.sort_prop].localeCompare(b[this.sort_prop],'zh-CN')})
                 }
             }else{
                 if(this.sort_prop == 'emp_sn'){
                     this.nurses.sort((a, b) => {return b[this.sort_prop] - a[this.sort_prop]})
                 }else{
-                    this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})
+{#                    this.nurses.sort((a,b) => {return b[this.sort_prop] > a[this.sort_prop]})#}
+                    this.nurses.sort((a,b) => {return b[this.sort_prop].localeCompare(a[this.sort_prop],'zh-CN')})
                 }
             }
+{#            console.log(this.nurses)#}
             //如果有搜索，再将数据筛选出来
             this.filter_nurses = this.nurses.filter(data => {
                 return Object.keys(data).some(key => {
