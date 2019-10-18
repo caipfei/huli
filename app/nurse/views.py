@@ -5,69 +5,61 @@ from flask import Blueprint, render_template, jsonify, url_for, redirect, reques
     current_app
 from ..models import User, Nurse, Dept
 from .. import db
+from ..decorators import login_required
 from datetime import datetime, timedelta
 import json
 import time
 import xlrd
 
 
-huli = Blueprint('huli', __name__)
+nurse = Blueprint('nurse', __name__)
 
-@huli.route('/', methods=['GET'])
-def home():
-    return redirect(url_for('.index'))
+# @nurse.route('/', methods=['GET'])
+# def home():
+#     return redirect(url_for('.index'))
 
 '''登陆'''
-@huli.route('/login', methods=['GET', 'POST'])
-def login():
-    if request.method == 'GET':
-        arg = request.args
-        if 'alert_msg' in arg:
-            alert_msg = arg['alert_msg']
-            alert_show = 'true'
-        else:
-            alert_msg = ''
-            alert_show = 'false'
-        return render_template('login.html', alert_msg=alert_msg, alert_show=alert_show)
-    else:
-        data = request.get_json()
-        username = data['username']
-        password = data['password']
-        user = User.query.filter_by(username=username).first()
-        if user:
-            if user.password == password:
-                if user.enable:
-                    response = make_response(jsonify({'code': 0, 'data': {'username': username, 'nickname': user.nickname}}))
-                    sessionid = user.generate_token()
-                    outtime = datetime.today() + timedelta(seconds=current_app.config.get('COOKIE_EXPIRES', 3600))
-                    response.set_cookie('sessionid', sessionid, expires=outtime)
-                    return response
-                else:
-                    return jsonify({'code': 10001, 'msg': '该用户已被禁用'})
-            else:
-                return jsonify({'code': 10000, 'msg': '用户名或密码错误'})
-        else:
-            return jsonify({'code': 10002, 'msg': '用户不存在'})
+# @nurse.route('/login', methods=['GET', 'POST'])
+# def login():
+#     if request.method == 'GET':
+#         arg = request.args
+#         if 'alert_msg' in arg:
+#             alert_msg = arg['alert_msg']
+#             alert_show = 'true'
+#         else:
+#             alert_msg = ''
+#             alert_show = 'false'
+#         return render_template('login.html', alert_msg=alert_msg, alert_show=alert_show)
+#     else:
+#         data = request.get_json()
+#         username = data['username']
+#         password = data['password']
+#         user = User.query.filter_by(username=username).first()
+#         if user:
+#             if user.password == password:
+#                 if user.enable:
+#                     response = make_response(jsonify({'code': 0, 'data': {'username': username, 'nickname': user.nickname}}))
+#                     sessionid = user.generate_token()
+#                     outtime = datetime.today() + timedelta(seconds=current_app.config.get('COOKIE_EXPIRES', 3600))
+#                     response.set_cookie('sessionid', sessionid, expires=outtime)
+#                     return response
+#                 else:
+#                     return jsonify({'code': 10001, 'msg': '该用户已被禁用'})
+#             else:
+#                 return jsonify({'code': 10000, 'msg': '用户名或密码错误'})
+#         else:
+#             return jsonify({'code': 10002, 'msg': '用户不存在'})
 
-
-@huli.route('/index', methods=['Get'])
+@nurse.route('/index', methods=['Get'])
+@login_required
 def index():
-    return render_template('index1.html')
+    return render_template('nurse/index.html')
 
-'''获取科室列表'''
-@huli.route('/get_dept', methods=['GET'])
-def get_dept():
-    depts = Dept.query.all()
-    data = []
-    for item in depts:
-        id = item.id
-        name = item.dept_name
-        data.append({'id': id, 'name': name})
-    return jsonify({'code': 0, 'data': data})
 
 '''获取护士列表'''
-@huli.route('/get_nurses', methods=['GET'])
-def get_nurses():
+@nurse.route('/all', methods=['GET'])
+@login_required
+def get_all():
     nurses = Nurse.query.all()
     data = []
     for item in nurses:
@@ -80,7 +72,8 @@ def get_nurses():
 
 
 '''获取护士详细信息'''
-@huli.route('/get_nurse/<emp_sn>', methods=['GET', 'POST'])
+@nurse.route('/get/<emp_sn>', methods=['GET', 'POST'])
+@login_required
 def get_nurse(emp_sn):
     nurse = Nurse.query.filter_by(emp_sn=emp_sn).first()
     if nurse:
@@ -89,12 +82,12 @@ def get_nurse(emp_sn):
         return jsonify({'code': 10006, 'msg': '未查到工号为%s的护士' % emp_sn})
 
 '''添加护士'''
-@huli.route('/add_nurse', methods=['GET', 'POST'])
-def add_nurse():
+@nurse.route('/add', methods=['GET', 'POST'])
+@login_required
+def add():
     if request.method == 'GET':
-        return render_template('addNurse.html')
+        return render_template('nurse/addNurse.html')
     data = request.get_json()
-    print(data)
     emp_sn = data['emp_sn']
     if Nurse.query.filter_by(emp_sn=emp_sn).all():
         return jsonify({'code': 10003, 'msg': '工号为%s的人员已存在' % emp_sn})
@@ -109,8 +102,9 @@ def add_nurse():
         return jsonify({'code': 10004, 'msg': str(e)})
 
 '''批量导入'''
-@huli.route('/upload_nurse', methods=['POST'])
-def uplosd_nurse():
+@nurse.route('/upload', methods=['POST'])
+@login_required
+def upload():
     file = request.files['file']
     f = file.read()
     data = xlrd.open_workbook(file_contents=f)
@@ -120,7 +114,6 @@ def uplosd_nurse():
     table = data.sheets()[table_index]
     nrows = table.nrows
     ncols = table.ncols
-    print(nrows, ncols)
     if ncols < 30:
         return jsonify({'code': 1005, 'msg': '数据表格式不正确'})
     # print(table.row_values(0))
@@ -188,15 +181,15 @@ def uplosd_nurse():
             db.session.commit()
         except Exception as e:
             print(e)
-            # print(emp_sn)
             db.session.rollback()
             error_count += 1
             continue
     return jsonify({'code': 0, 'total': total, 'error_count': error_count, 'success_count': total-error_count})
 
 '''删除护士'''
-@huli.route('/del_nurse', methods=['POST'])
-def del_nurse():
+@nurse.route('/delete', methods=['POST'])
+@login_required
+def delete():
     data = request.get_json()
     emps = data['emps']
     try:
@@ -209,13 +202,13 @@ def del_nurse():
         return jsonify({'code': 10005, 'msg': '删除失败'})
 
 '''获取更新护士信息'''
-@huli.route('/nurse_detail/<emp_sn>', methods=['GET', 'POST'])
-def update_nurse(emp_sn):
+@nurse.route('/detail/<emp_sn>', methods=['GET', 'POST'])
+@login_required
+def detail(emp_sn):
     if request.method == 'GET':
-        return render_template('detail.html', emp_sn=emp_sn)
+        return render_template('nurse/detail.html', emp_sn=emp_sn)
     else:
         data = request.get_json()
-        print(data)
         try:
             Nurse.query.filter_by(emp_sn=emp_sn).update(data)
             db.session.commit()

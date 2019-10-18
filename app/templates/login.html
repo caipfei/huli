@@ -103,7 +103,7 @@
                         }).then(response => {
                             if(response.data.code == 0){
                                 window.sessionStorage.setItem('user_info', JSON.stringify(response.data.data))
-                                location.assign('/huli/index')
+                                location.assign('/huli/nurse/index')
                             }else{
                                 console.log(response.data)
                                 this.alert_msg = response.data['msg']

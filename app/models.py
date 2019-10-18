@@ -62,6 +62,8 @@ class Dept(db.Model):
     code = db.Column(db.String(16))                         #科室编码
     dept_name = db.Column(db.String(32), nullable=False)    #科室名称
     nurses = db.relationship('Nurse', backref='dept')
+    outdepts = db.relation('Transfer', backref='outdept')
+    indepts = db.relation('Transfer', backref='indept')
 
 
 
@@ -87,5 +89,14 @@ class User(db.Model):
         except Exception:
             return None
 
-
-
+'''调动记录模型'''
+class Transfer(db.Model):
+    __tablename__ = 'transfer'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    name = db.Column(db.String(64), nullable=False)
+    outdept_id = db.Column(db.Integer, db.ForeignKey('dept.id'), nullable=False)
+    indept_id = db.Column(db.Integer, db.ForeignKey('dept.id'), nullable=False)
+    trans_date = db.Column(db.Date, nullable=False)
+    end_date = db.Column(db.Date)
+    trans_type = db.Column(db.String(64))
+    remark = db.Column(db.String(255))

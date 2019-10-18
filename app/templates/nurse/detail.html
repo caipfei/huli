@@ -233,7 +233,7 @@
             get_depts(){
                 axios({
                     method: 'get',
-                    url: '{{ url_for(".get_dept") }}'
+                    url: '{{ url_for("main.get_dept") }}'
                 }).then(response =>{
                     if(response.data.code == 0){
                         this.depts = response.data.data
@@ -263,7 +263,7 @@
             get_nurse_detail(){
                 axios({
                     method: 'get',
-                    url: "{{ url_for('.get_nurse', emp_sn=emp_sn) }}",
+                    url: "{{ url_for('nurse.get_nurse', emp_sn=emp_sn) }}",
                 }).then(response => {
                     console.log(response)
                     if(response.data.code == 0){
@@ -291,7 +291,7 @@
                         delete data.emp_sn
                         axios({
                             method: 'post',
-                            url: "{{ url_for('.update_nurse', emp_sn=emp_sn) }}",
+                            url: "{{ url_for('nurse.detail', emp_sn=emp_sn) }}",
                             data: data
                         }).then(response => {
                             if(response.data.code == 0){

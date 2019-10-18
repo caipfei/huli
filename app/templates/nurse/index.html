@@ -21,7 +21,7 @@
         <el-button type="primary" icon="el-icon-search" size="medium" @click="handleSearch">查询</el-button>
         <el-button type="primary" icon="el-icon-plus" size="medium" @click="add_nurse">添加</el-button>
         <el-button type="primary" icon="el-icon-delete" size="medium" @click="del_nurse">删除</el-button>
-        <el-upload style="display:inline;margin:0 10px;" action="/huli/upload_nurse" class="upload-demo"
+        <el-upload style="display:inline;margin:0 10px;" action="{{ url_for('nurse.upload') }}" class="upload-demo"
             list-type="text" :show-file-list="false" :before-upload="beforeUpload" :on-progress="uploadProgress"
             :on-success="uploadSuccess" :on-error="uploadError">
             <el-button type="primary" icon="el-icon-upload" size="medium" @click="">批量导入</el-button>
@@ -34,7 +34,8 @@
         <el-table-column type="selection" width="60px" align="center"></el-table-column>
         <el-table-column prop="emp_sn" label="工号" sortable="custom">
             <template slot-scope="scope">
-                <a :href="'/huli/nurse_detail/'+ scope.row.emp_sn">{[ scope.row.emp_sn ]}</a>
+                <a :href="'/huli/nurse/detail/'+ scope.row.emp_sn">{[ scope.row.emp_sn ]}</a>
+{#                <a :href="{{ url_for('nurse.detail', emp_sn='scope.row.emp_sn') }}">{[ scope.row.emp_sn ]}</a>#}
             </template>
         </el-table-column>
         <el-table-column prop="name" label="姓名" sortable="custom"></el-table-column>
@@ -78,7 +79,7 @@ new Vue({
         get_nurses(){
             axios({
                 method: 'get',
-                url: '{{ url_for('.get_nurses') }}'
+                url: '{{ url_for("nurse.get_all") }}'
             }).then(response => {
                 this.loading = false
                 if(response.data.code == 0){
@@ -122,7 +123,7 @@ new Vue({
             this.total_page = Math.ceil(this.total / this.pageSize)
         },
         add_nurse(){
-            window.location.assign('{{ url_for('.add_nurse') }}')
+            window.location.assign('{{ url_for("nurse.add") }}')
         },
         del_nurse(){
             let emps = []
@@ -137,7 +138,7 @@ new Vue({
             }
             axios({
                 method: 'post',
-                url: '{{ url_for('.del_nurse') }}',
+                url: '{{ url_for("nurse.delete") }}',
                 data: {emps: emps}
             }).then(response => {
                 if(response.data.code == 0){

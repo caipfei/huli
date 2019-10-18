@@ -12,8 +12,14 @@ def create_app(config_name='default'):
     app.config.from_object(config[config_name])
     db.init_app(app)
 
-    from .nursing.views import huli
-    app.register_blueprint(huli, url_prefix='/huli')
+    from .main.views import main
+    app.register_blueprint(main, url_prefix='/huli/')
+
+    from .nurse.views import nurse
+    app.register_blueprint(nurse, url_prefix='/huli/nurse')
+
+    from .transfer.views import transfer
+    app.register_blueprint(transfer, url_prefix='/huli/transfer')
 
     return app
 

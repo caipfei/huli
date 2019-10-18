@@ -260,7 +260,7 @@
             get_depts(){
                 axios({
                     method: 'get',
-                    url: '{{ url_for(".get_dept") }}'
+                    url: '{{ url_for("main.get_dept") }}'
                 }).then(response =>{
                     if(response.data.code == 0){
                         this.depts = response.data.data
@@ -293,7 +293,7 @@
                         this.submiting = true
                         axios({
                             method: 'post',
-                            url: '{{ url_for('.add_nurse') }}',
+                            url: '{{ url_for('nurse.add') }}',
                             data: this.nurseData
                         }).then(response => {
                             console.log(response.data)
