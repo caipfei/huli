@@ -19,6 +19,7 @@ def index():
 '''用户登录'''
 @main.route('/login', methods=['GET', 'POST'])
 def login():
+    print(request.args)
     if request.method == 'GET':
         arg = request.args
         if 'alert_msg' in arg:

@@ -14,41 +14,9 @@ import xlrd
 
 nurse = Blueprint('nurse', __name__)
 
-# @nurse.route('/', methods=['GET'])
-# def home():
-#     return redirect(url_for('.index'))
-
-'''登陆'''
-# @nurse.route('/login', methods=['GET', 'POST'])
-# def login():
-#     if request.method == 'GET':
-#         arg = request.args
-#         if 'alert_msg' in arg:
-#             alert_msg = arg['alert_msg']
-#             alert_show = 'true'
-#         else:
-#             alert_msg = ''
-#             alert_show = 'false'
-#         return render_template('login.html', alert_msg=alert_msg, alert_show=alert_show)
-#     else:
-#         data = request.get_json()
-#         username = data['username']
-#         password = data['password']
-#         user = User.query.filter_by(username=username).first()
-#         if user:
-#             if user.password == password:
-#                 if user.enable:
-#                     response = make_response(jsonify({'code': 0, 'data': {'username': username, 'nickname': user.nickname}}))
-#                     sessionid = user.generate_token()
-#                     outtime = datetime.today() + timedelta(seconds=current_app.config.get('COOKIE_EXPIRES', 3600))
-#                     response.set_cookie('sessionid', sessionid, expires=outtime)
-#                     return response
-#                 else:
-#                     return jsonify({'code': 10001, 'msg': '该用户已被禁用'})
-#             else:
-#                 return jsonify({'code': 10000, 'msg': '用户名或密码错误'})
-#         else:
-#             return jsonify({'code': 10002, 'msg': '用户不存在'})
+@nurse.route('/', methods=['GET'])
+def home():
+    return redirect(url_for('.index'))
 
 @nurse.route('/index', methods=['Get'])
 @login_required
@@ -116,13 +84,6 @@ def upload():
     ncols = table.ncols
     if ncols < 30:
         return jsonify({'code': 1005, 'msg': '数据表格式不正确'})
-    # print(table.row_values(0))
-    # print(table.row_values(1))
-    # print(table.row_values(3))
-    # print(table.cell(3, 7).ctype)
-    # print(table.cell(3, 13).ctype)
-    # d = datetime(*xlrd.xldate_as_tuple(table.cell_value(3, 13), 0))
-    # print(d.strftime('%Y/%m/%d'))
     total = nrows - 2
     error_count = 0
     for i in range(2, nrows):

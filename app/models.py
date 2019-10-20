@@ -56,17 +56,6 @@ class Nurse(db.Model):
                 'post1': self.post1, 'post2': self.post2, 'status': self.status}
 
 
-class Dept(db.Model):
-    __tablename__ = 'dept'
-    id = db.Column(db.Integer, primary_key=True, autoincrement=True)    #科室ID
-    code = db.Column(db.String(16))                         #科室编码
-    dept_name = db.Column(db.String(32), nullable=False)    #科室名称
-    nurses = db.relationship('Nurse', backref='dept')
-    outdepts = db.relation('Transfer', backref='outdept')
-    indepts = db.relation('Transfer', backref='indept')
-
-
-
 class User(db.Model):
     __tablename__ = 'user'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -100,3 +89,12 @@ class Transfer(db.Model):
     end_date = db.Column(db.Date)
     trans_type = db.Column(db.String(64))
     remark = db.Column(db.String(255))
+
+class Dept(db.Model):
+    __tablename__ = 'dept'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 科室ID
+    code = db.Column(db.String(16))  # 科室编码
+    dept_name = db.Column(db.String(32), nullable=False)  # 科室名称
+    nurses = db.relationship('Nurse', backref='dept')
+    outdepts = db.relationship('Transfer', backref='outdept', foreign_keys=[Transfer.outdept_id])
+    indepts = db.relationship('Transfer', backref='indept', foreign_keys=[Transfer.indept_id])
