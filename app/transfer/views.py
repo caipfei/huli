@@ -37,12 +37,12 @@ def get_list():
     start = size * (page - 1)
     end = size * page
     if search:
-        items = Transfer.query.filter_by(name=search).order_by(Transfer.trans_date.desc(), Transfer.id.desc()).slice(start, end).all()
+        pagination = Transfer.query.filter(Transfer.name.like('%%%s%%' % search)).order_by(Transfer.trans_date.desc(), Transfer.id.desc()).paginate(page, size)
     else:
-        items = Transfer.query.order_by(Transfer.trans_date.desc()).slice(start, end).all()
-    total = len(items)
-    total_page = math.ceil(total / size)
-    for item in items:
+        pagination = Transfer.query.order_by(Transfer.trans_date.desc(), Transfer.id.desc()).paginate(page, size)
+    total = pagination.total
+    total_page = pagination.pages
+    for item in pagination.items:
         id = item.id
         name = item.name
         outdept = item.outdept.dept_name
