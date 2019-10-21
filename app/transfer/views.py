@@ -43,6 +43,7 @@ def get_list():
     total = len(items)
     total_page = math.ceil(total / size)
     for item in items:
+        id = item.id
         name = item.name
         outdept = item.outdept.dept_name
         indept = item.indept.dept_name
@@ -51,8 +52,9 @@ def get_list():
         trans_type = item.trans_type
         remark = item.remark
         data.append({'name': name, 'outdept': outdept, 'indept': indept, 'trans_date': trans_date, 'end_date': end_date,
-                     'trans_type': trans_type, 'remark': remark})
+                     'trans_type': trans_type, 'remark': remark, 'id': id})
     return jsonify({'code': 0, 'total': total, 'total_page': total_page, 'currentPage': page, 'pageSize': size, 'data': data})
+
 
 @transfer.route('/add', methods=['POST'])
 @login_required
@@ -68,5 +70,20 @@ def add():
         print(e)
         db.session.rollback()
         return jsonify({'code': 10008, 'msg': str(e)})
+
+
+@transfer.route('/del', methods=['POST'])
+@login_required
+def delete():
+    data = request.get_json()
+    ids = data['ids']
+    try:
+        Transfer.query.filter(Transfer.id.in_(ids)).delete(synchronize_session=False)
+        db.session.commit()
+        return jsonify({'code': 0})
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        return jsonify({'code': 10005, 'msg': str(e)})
 
 

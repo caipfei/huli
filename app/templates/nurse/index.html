@@ -32,6 +32,7 @@
           v-loading="loading" element-loading-text="数据加载中" highlight-current-row
          :default-sort="{prop: sort_prop, order: sort_order}" @sort-change="handleSortChange">
         <el-table-column type="selection" width="60px" align="center"></el-table-column>
+        <el-table-column type="index" width="50"></el-table-column>
         <el-table-column prop="emp_sn" label="工号" sortable="custom">
             <template slot-scope="scope">
                 <a :href="'/huli/nurse/detail/'+ scope.row.emp_sn">{[ scope.row.emp_sn ]}</a>

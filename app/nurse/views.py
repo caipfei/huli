@@ -56,6 +56,7 @@ def add():
     if request.method == 'GET':
         return render_template('nurse/addNurse.html')
     data = request.get_json()
+    print(data)
     emp_sn = data['emp_sn']
     if Nurse.query.filter_by(emp_sn=emp_sn).all():
         return jsonify({'code': 10003, 'msg': '工号为%s的人员已存在' % emp_sn})
