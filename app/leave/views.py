@@ -45,13 +45,43 @@ def get_list():
         id = item.id
         emp_sn = item.emp_sn
         name = item.name
-        dept_id = item.dept_id
+        dept = item.dept.dept_name
         time_start = item.time_start.strftime('%Y-%m-%d %H:%M:%S')
         time_end = item.time_end.strftime('%Y-%m-%d %H:%M:%S')
         days = item.days
         leave_type = item.leave_type
         remark = item.remark
-        data.append({'id': id, 'emp_sn': emp_sn, 'name': name, 'dept_id': dept_id, 'time_start': time_start,
+        data.append({'id': id, 'emp_sn': emp_sn, 'name': name, 'dept': dept, 'time_start': time_start,
                      'time_end': time_end, 'days':days, 'leave_type': leave_type, 'remark': remark})
     return jsonify({'code': 0, 'total': total, 'total_page': total_page, 'currentPage': page, 'pageSize': size, 'data': data})
 
+
+@leave.route('/add', methods=['POST'])
+@login_required
+def add():
+    data = request.get_json()
+    print(data)
+    leave = Leave(**data)
+    try:
+        db.session.add(leave)
+        db.session.commit()
+        return jsonify({'code': 0})
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        return jsonify({'code': 10008, 'msg': str(e)})
+
+
+@leave.route('/del', methods=['POST'])
+@login_required
+def delete():
+    data = request.get_json()
+    ids = data['ids']
+    try:
+        Leave.query.filter(Leave.id.in_(ids)).delete(synchronize_session=False)
+        db.session.commit()
+        return jsonify({'code': 0})
+    except Exception as e:
+        print(e)
+        db.session.rollback()
+        return jsonify({'code': 10005, 'msg': str(e)})

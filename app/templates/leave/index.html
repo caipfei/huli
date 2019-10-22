@@ -23,10 +23,10 @@
         <el-input v-model.trim="search" placeholder="按姓名查询" style="display:inline-block;width:300px"></el-input>
         <el-button type="primary" icon="el-icon-search" size="medium" @click="handleSearch">查询</el-button>
         <el-button type="primary" icon="el-icon-plus" size="medium" @click="addClick">添加</el-button>
-        <el-button type="primary" icon="el-icon-delete" size="medium" @click="">删除</el-button>
+        <el-button type="primary" icon="el-icon-delete" size="medium" @click="del_leaves">删除</el-button>
         <el-button type="primary" icon="el-icon-refresh" size="medium" @click="refresh_table">刷新列表</el-button>
     </div>
-    <el-table :data="leave_data" ref="transferList" :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+    <el-table :data="leave_data" ref="leaveList" :header-cell-style="{background:'#eef1f6',color:'#606266'}"
           v-loading="loading" element-loading-text="数据加载中" highlight-current-row>
         <el-table-column type="selection" width="60px" align="center"></el-table-column>
         <el-table-column type="index" width="50"></el-table-column>
@@ -59,11 +59,8 @@
 
     <el-dialog title="添加请假记录" :visible.sync="dialogFormVisible" center @close="closeDialog">
         <el-form :model="addForm" ref="leaveDataForm" :rules="addFormRules">
-{#            <el-form-item label="姓名：" :label-width="formLabelWidth" prop="name">#}
-{#                <el-input v-model.trim="addForm.name"></el-input>#}
-{#            </el-form-item>#}
             <el-form-item label="姓名" prop="emp_sn" :label-width="formLabelWidth">
-                <el-select v-model="addForm.emp_sn" filterable clearable no-match-text="没有该护士，请先添加" @blur="nurseSelect">
+                <el-select v-model="addForm.emp_sn" filterable clearable no-match-text="没有该护士，请先添加" @change="nurseChange" @clear="nurseClear">
                     <el-option v-for="item in nurses" :key="item.emp_sn" :label="item.name" :value="item.emp_sn">
                         <span style="float: left">{[ item.name ]}</span>
                         <span style="float: right; color: #8492a6;">{[ item.emp_sn ]}</span>
@@ -94,7 +91,7 @@
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="add_trans" :loading="submiting">添加</el-button>
+            <el-button type="primary" @click="add_leave" :loading="submiting">添加</el-button>
             <el-button type="primary" @click="handleCancel">取消</el-button>
         </div>
     </el-dialog>
@@ -194,16 +191,16 @@ new Vue({
 
             })
         },
-        nurseSelect(){
-            console.log(this.addForm)
-            console.log(this.addForm['emp_sn'])
+        nurseChange(){
             let emp_sn = this.addForm.emp_sn
-            console.log(emp_sn)
             let nurse = this.nurses.filter(item => {return item.emp_sn == emp_sn})
             console.log(nurse)
             if(nurse.length > 0){
                 this.addForm.dept_id = nurse[0].dept_id
             }
+        },
+        nurseClear(){
+            this.addForm.dept_id = null
         },
         //搜索
         handleSearch(){
@@ -221,8 +218,8 @@ new Vue({
             this.get_nurse_info()
         },
         //添加记录
-        add_trans(){
-            this.$refs.transDataForm.validate(valid =>{
+        add_leave(){
+            this.$refs.leaveDataForm.validate(valid =>{
                 if(valid){
                     this.submiting = true
                     data = this.addForm
@@ -236,7 +233,7 @@ new Vue({
                     }
                     axios({
                         method: 'post',
-                        url: '{{ url_for("transfer.add") }}',
+                        url: '{{ url_for("leave.add") }}',
                         data: this.addForm,
                         headers: {'Content-Type': 'application/json'}
                     }).then(response => {
@@ -258,7 +255,7 @@ new Vue({
         },
         //取消
         handleCancel(){
-            this.$refs.leaveDataForm.resetFields()
+            this.$refs.leaveList.resetFields()
             this.dialogFormVisible=false
         },
         //关闭dialog
@@ -267,9 +264,9 @@ new Vue({
             this.refresh_table()
         },
         //删除
-        del_trans(){
+        del_leaves(){
             let ids = []
-            this.$refs.leaveDataForm.selection.map(item => ids.push(item.id))
+            this.$refs.leaveList.selection.map(item => ids.push(item.id))
             if(ids.length == 0){
                 this.$message({
                     showClose: true,
@@ -280,7 +277,7 @@ new Vue({
             }
             axios({
                 method: 'post',
-                url: '{{ url_for("transfer.delete") }}',
+                url: '{{ url_for("leave.delete") }}',
                 data: {ids: ids}
             }).then(response => {
                 if(response.data.code == 0){
