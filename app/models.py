@@ -36,6 +36,8 @@ class Nurse(db.Model):
     post1 = db.Column(db.String(32))                    #岗位1
     post2 = db.Column(db.String(32))                    #岗位2
     status = db.Column(db.String(32))                   #身份
+    transfers = db.relationship('Transfer', backref='nurse')
+    leaves = db.relationship('Leave', backref='nurse')
 
     def to_dict(self):
         birth_date = self.birth_date.strftime('%Y-%m-%d') if self.birth_date else None
@@ -82,6 +84,7 @@ class User(db.Model):
 class Transfer(db.Model):
     __tablename__ = 'transfer'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    emp_sn = db.Column(db.String(8), db.ForeignKey('nurse.emp_sn'), nullable=False)
     name = db.Column(db.String(64), nullable=False)
     outdept_id = db.Column(db.Integer, db.ForeignKey('dept.id'), nullable=False)
     indept_id = db.Column(db.Integer, db.ForeignKey('dept.id'), nullable=False)
@@ -90,11 +93,24 @@ class Transfer(db.Model):
     trans_type = db.Column(db.String(64))
     remark = db.Column(db.String(255))
 
+class Leave(db.Model):
+    __tablename__ = 'leave'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    emp_sn = db.Column(db.String(8), db.ForeignKey('nurse.emp_sn'), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
+    time_start = db.Column(db.DateTime, nullable=False)
+    time_end = db.Column(db.DateTime, nullable=False)
+    days = db.Column(db.Float, nullable=False)
+    leave_type = db.Column(db.String(32), nullable=False)
+    remark = db.Column(db.String(255))
+
 class Dept(db.Model):
     __tablename__ = 'dept'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 科室ID
     code = db.Column(db.String(16))  # 科室编码
     dept_name = db.Column(db.String(32), nullable=False)  # 科室名称
     nurses = db.relationship('Nurse', backref='dept')
-    outdepts = db.relationship('Transfer', backref='outdept', foreign_keys=[Transfer.outdept_id])
-    indepts = db.relationship('Transfer', backref='indept', foreign_keys=[Transfer.indept_id])
+    outdept_trans = db.relationship('Transfer', backref='outdept', foreign_keys=[Transfer.outdept_id])
+    indept_trans = db.relationship('Transfer', backref='indept', foreign_keys=[Transfer.indept_id])
+    leaves = db.relationship('Leave', backref='dept')

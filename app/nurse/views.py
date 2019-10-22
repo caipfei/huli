@@ -39,6 +39,13 @@ def get_all():
     return jsonify({'code': 0, 'data': data})
 
 
+@nurse.route('/get_info', methods=['GET'])
+@login_required
+def get_info():
+    nurses = Nurse.query.order_by(Nurse.emp_sn).all()
+    data = [{'emp_sn': item.emp_sn, 'name': item.name, 'dept_id': item.dept_id} for item in nurses]
+    return jsonify({'code': 0, 'data': data})
+
 '''获取护士详细信息'''
 @nurse.route('/get/<emp_sn>', methods=['GET', 'POST'])
 @login_required

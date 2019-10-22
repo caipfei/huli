@@ -21,6 +21,9 @@ def create_app(config_name='default'):
     from .transfer.views import transfer
     app.register_blueprint(transfer, url_prefix='/huli/transfer')
 
+    from .leave.views import leave
+    app.register_blueprint(leave, url_prefix='/huli/leave')
+
     return app
 
 

@@ -7,6 +7,14 @@ function getDays(date1, date2) {//date1:小日期   date2:大日期
     return day;
 }
 
+function getFloatDays(date1, date2) {
+    var sdate = new Date(date1);
+    var now = new Date(date2);
+    var days = now.getTime() - sdate.getTime();
+    var day = parseFloat(days / (1000 * 60 * 60 * 24)).toFixed(1);
+    return day;
+}
+
 //根据出生日期计算年龄，精确到小数
 function getAge(strBirth) {
     var now = new Date()

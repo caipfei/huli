@@ -36,7 +36,6 @@
         <el-table-column prop="emp_sn" label="工号" sortable="custom">
             <template slot-scope="scope">
                 <a :href="'/huli/nurse/detail/'+ scope.row.emp_sn">{[ scope.row.emp_sn ]}</a>
-{#                <a :href="{{ url_for('nurse.detail', emp_sn='scope.row.emp_sn') }}">{[ scope.row.emp_sn ]}</a>#}
             </template>
         </el-table-column>
         <el-table-column prop="name" label="姓名" sortable="custom"></el-table-column>

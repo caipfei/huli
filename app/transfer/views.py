@@ -34,8 +34,6 @@ def get_list():
     size = args.get('size', 20, type=int)
     search = args.get('search', None)
     data = []
-    start = size * (page - 1)
-    end = size * page
     if search:
         pagination = Transfer.query.filter(Transfer.name.like('%%%s%%' % search)).order_by(Transfer.trans_date.desc(), Transfer.id.desc()).paginate(page, size)
     else:
@@ -44,15 +42,16 @@ def get_list():
     total_page = pagination.pages
     for item in pagination.items:
         id = item.id
+        emp_sn = item.emp_sn
         name = item.name
         outdept = item.outdept.dept_name
         indept = item.indept.dept_name
         trans_date = item.trans_date.strftime('%Y-%m-%d')
-        end_date = item.end_date.strftime('%Y-%m-%d')
+        end_date = item.end_date.strftime('%Y-%m-%d') if item.end_date else None
         trans_type = item.trans_type
         remark = item.remark
         data.append({'name': name, 'outdept': outdept, 'indept': indept, 'trans_date': trans_date, 'end_date': end_date,
-                     'trans_type': trans_type, 'remark': remark, 'id': id})
+                     'trans_type': trans_type, 'remark': remark, 'id': id, 'emp_sn': emp_sn})
     return jsonify({'code': 0, 'total': total, 'total_page': total_page, 'currentPage': page, 'pageSize': size, 'data': data})
 
 
