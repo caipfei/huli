@@ -1,14 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-from flask import Blueprint, render_template, jsonify, url_for, redirect, request, make_response, \
-    current_app
-from ..models import User, Nurse, Dept
+from flask import Blueprint, render_template, jsonify, url_for, redirect, request
+from ..models import Nurse, Dept
 from .. import db
-from ..decorators import login_required
-from datetime import datetime, timedelta
-import json
-import time
+from ..decorators import login_required, login_required_ajax
+from datetime import datetime
 import xlrd
 
 
@@ -26,7 +23,7 @@ def index():
 
 '''获取护士列表'''
 @nurse.route('/all', methods=['GET'])
-@login_required
+@login_required_ajax
 def get_all():
     nurses = Nurse.query.all()
     data = []
@@ -40,7 +37,7 @@ def get_all():
 
 
 @nurse.route('/get_info', methods=['GET'])
-@login_required
+@login_required_ajax
 def get_info():
     nurses = Nurse.query.order_by(Nurse.emp_sn).all()
     data = [{'emp_sn': item.emp_sn, 'name': item.name, 'dept_id': item.dept_id} for item in nurses]
@@ -48,7 +45,7 @@ def get_info():
 
 '''获取护士详细信息'''
 @nurse.route('/get/<emp_sn>', methods=['GET', 'POST'])
-@login_required
+@login_required_ajax
 def get_nurse(emp_sn):
     nurse = Nurse.query.filter_by(emp_sn=emp_sn).first()
     if nurse:
@@ -79,7 +76,7 @@ def add():
 
 '''批量导入'''
 @nurse.route('/upload', methods=['POST'])
-@login_required
+@login_required_ajax
 def upload():
     file = request.files['file']
     f = file.read()
@@ -157,7 +154,7 @@ def upload():
 
 '''删除护士'''
 @nurse.route('/delete', methods=['POST'])
-@login_required
+@login_required_ajax
 def delete():
     data = request.get_json()
     emps = data['emps']

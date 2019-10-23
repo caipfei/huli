@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 
-{% block title %}护理管理信息系统——请假记录{% endblock %}
+{% block title %}护理管理信息系统——培训记录{% endblock %}
 
 {% block style %}
     .el-table{
@@ -18,37 +18,39 @@
 {% endblock %}
 
 {% block  main %}
-    <div style="margin-bottom:20px;padding-left:20px;"><strong>请假记录列表</strong></div>
+    <div style="margin-bottom:20px;padding-left:20px;"><strong>培训记录列表</strong></div>
     <div class="content-tool">
         <el-input v-model.trim="search" placeholder="按姓名查询" style="display:inline-block;width:300px"></el-input>
         <el-button type="primary" icon="el-icon-search" size="medium" @click="handleSearch">查询</el-button>
         <el-button type="primary" icon="el-icon-plus" size="medium" @click="addClick">添加</el-button>
-        <el-button type="primary" icon="el-icon-delete" size="medium" @click="del_leaves">删除</el-button>
+        <el-button type="primary" icon="el-icon-delete" size="medium" @click="del_trains">删除</el-button>
         <el-button type="primary" icon="el-icon-refresh" size="medium" @click="refresh_table">刷新列表</el-button>
     </div>
-    <el-table :data="leave_data" ref="leaveList" :header-cell-style="{background:'#eef1f6',color:'#606266'}"
+    <el-table :data="train_data" ref="trainList" :header-cell-style="{background:'#eef1f6',color:'#606266'}"
           v-loading="loading" element-loading-text="数据加载中" highlight-current-row>
         <el-table-column type="selection" width="60px" align="center"></el-table-column>
         <el-table-column type="index" width="50"></el-table-column>
         <el-table-column prop="id" label="ID" v-if="false"></el-table-column>
-        <el-table-column prop="name" label="姓名">
+        <el-table-column prop="name" label="参加人员">
             <template slot-scope="scope">
                 <a :href="'/huli/nurse/detail/'+ scope.row.emp_sn">{[ scope.row.name ]}</a>
             </template>
         </el-table-column>
         </el-table-column>
         <el-table-column prop="dept" label="科室"></el-table-column>
-        <el-table-column prop="time_start" label="开始时间"></el-table-column>
-        <el-table-column prop="time_end" label="结束时间"></el-table-column>
-        <el-table-column prop="days" label="休假天数"></el-table-column>
-        <el-table-column prop="leave_type" label="休假事由"></el-table-column>
+        <el-table-column prop="date_start" label="开始日期"></el-table-column>
+        <el-table-column prop="date_end" label="结束日期"></el-table-column>
+        <el-table-column prop="train_name" label="名称(培训、学术会议)" :show-overflow-tooltip="true"></el-table-column>
+        <el-table-column prop="place" label="地点"></el-table-column>
+        <el-table-column prop="fee" label="会务费(元/人)"></el-table-column>
         <el-table-column prop="remark" label="备注" :show-overflow-tooltip="true"></el-table-column>
     </el-table>
     <el-pagination
         @size-change="handleSizeChange"
         @current-change="handleCurrentChange"
         :current-page="currentPage"
-        :page-sizes="[20, 50, 100, 200, 500]"
+{#        :page-sizes="[20, 50, 100, 200, 500]"#}
+        :page-sizes="[2, 5, 10, 20, 50]"
         :page-size="pageSize"
         layout="total,sizes,prev,pager,next,jumper"
         :total="total"
@@ -57,8 +59,8 @@
     </el-pagination>
 
     <el-dialog title="添加请假记录" :visible.sync="dialogFormVisible" center @close="closeDialog">
-        <el-form :model="addForm" ref="leaveDataForm" :rules="addFormRules">
-            <el-form-item label="姓名" prop="emp_sn" :label-width="formLabelWidth">
+        <el-form :model="addForm" ref="trainDataForm" :rules="addFormRules">
+            <el-form-item label="参加人员" prop="emp_sn" :label-width="formLabelWidth">
                 <el-select v-model="addForm.emp_sn" filterable clearable no-match-text="没有该护士，请先添加" @change="nurseChange" @clear="nurseClear">
                     <el-option v-for="item in nurses" :key="item.emp_sn" :label="item.name" :value="item.emp_sn">
                         <span style="float: left">{[ item.name ]}</span>
@@ -71,26 +73,27 @@
                     <el-option v-for="item in depts" :key="item.id" :label="item.name" :value="item.id"></el-option>
                 </el-select>
             </el-form-item>
-            <el-form-item label="开始时间：" prop="time_start" :label-width="formLabelWidth">
-                <el-date-picker v-model="addForm.time_start" type="datetime" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+            <el-form-item label="开始日期：" prop="date_start" :label-width="formLabelWidth">
+                <el-date-picker v-model="addForm.date_start" type="date" value-format="yyyy-MM-dd"></el-date-picker>
             </el-form-item>
-            <el-form-item label="结束时间：" prop="time_end" :label-width="formLabelWidth">
-                <el-date-picker v-model="addForm.time_end" type="datetime" value-format="yyyy-MM-dd HH:mm:ss"></el-date-picker>
+            <el-form-item label="结束日期：" prop="date_end" :label-width="formLabelWidth">
+                <el-date-picker v-model="addForm.date_end" type="date" value-format="yyyy-MM-dd"></el-date-picker>
             </el-form-item>
-            <el-form-item label="休假天数：" prop="days" :label-width="formLabelWidth">
-                <el-input-number v-model="addForm.days" :precision="1" :step="1"></el-input-number>
+            <el-form-item label="名称(培训、学术会议)：" prop="train_name" :label-width="formLabelWidth">
+                <el-input v-model.trim="addForm.train_name"></el-input>
             </el-form-item>
-            <el-form-item label="休假事由：" prop="leave_type" :label-width="formLabelWidth">
-                <el-select v-model="addForm.leave_type">
-                    <el-option v-for="item in types" :key="item" :label="item" :value="item"></el-option>
-                </el-select>
+            <el-form-item label="地点：" prop="place" :label-width="formLabelWidth">
+                <el-input v-model.trim="addForm.place"></el-input>
+            </el-form-item>
+            <el-form-item label="会务费(元/人)：" prop="fee" :label-width="formLabelWidth">
+                <el-input v-model.trim.number="addForm.fee"></el-input>
             </el-form-item>
             <el-form-item label="备注：" prop="remark" :label-width="formLabelWidth">
                 <el-input v-model.trim="addForm.remark"></el-input>
             </el-form-item>
         </el-form>
         <div slot="footer" class="dialog-footer">
-            <el-button type="primary" @click="add_leave" :loading="submiting">添加</el-button>
+            <el-button type="primary" @click="add_train" :loading="submiting">添加</el-button>
             <el-button type="primary" @click="handleCancel">取消</el-button>
         </div>
     </el-dialog>
@@ -104,29 +107,28 @@ new Vue({
     data: {
         search: '',
         nickname: JSON.parse(window.sessionStorage.getItem('user_info')).nickname,
-        leave_data: [],
+        train_data: [],
         addForm: {
             emp_sn: null,
             name: null,
             dept_id: null,
-            time_start: null,
-            time_end: null,
-            days: null,
-            leave_type: null,
+            date_start: null,
+            date_end: null,
+            train_name: null,
+            place: null,
+            fee: null,
             remark: null,
         },
         dialogFormVisible: false,
-        formLabelWidth: '120px',
+        formLabelWidth: '180px',
         depts: {},
         nurses: {},
-        types: ['事假', '病假', '年假', '产假', '婚假', '探亲假', '丧家', '其他'],
         addFormRules: {
             emp_sn: [{required: true, message: '请输入姓名', trigger: 'blur'}],
             dept_id: [{required: true, message: '请选择科室', trigger: 'blur'}],
-            time_start: [{required: true, message: '请输入开始时间', trigger: 'blur'}],
-            time_end: [{required: true, message: '请输入结束时间', trigger: 'blur'}],
-            days: [{required: true, message: '请输入休假天数', trigger: 'blur'}],
-            leave_type: [{required: true, message: '请选择休假事由', trigger: 'blur'}]
+            date_start: [{required: true, message: '请输入开始日期', trigger: 'blur'}],
+            date_end: [{required: true, message: '请输入结束日期', trigger: 'blur'}],
+            train_name: [{required: true, message: '请输入名称', trigger: 'blur'}],
         },
         submiting: false,
         loading: false,
@@ -134,20 +136,19 @@ new Vue({
         pageSize: 20,
         total: 0,
         total_page: 0,
-        loadObject: null,
     },
     methods: {
-        //获取调动记录列表
+        //获取培训记录列表
         get_data(page, size){
             axios({
                 method: 'get',
-                url: '{{ url_for("leave.get_list") }}',
+                url: '{{ url_for("train.get_list") }}',
                 params: {page: page, size: size, search: this.search},
             }).then(response => {
                 this.loading = true
                 console.log(response)
                 if(response.data.code == 0){
-                    this.leave_data = response.data.data
+                    this.train_data = response.data.data
                     this.total = response.data.total
                     this.total_page = response.data.total_page
                     this.currentPage = response.data.currentPage
@@ -217,8 +218,8 @@ new Vue({
             this.get_nurse_info()
         },
         //添加记录
-        add_leave(){
-            this.$refs.leaveDataForm.validate(valid =>{
+        add_train(){
+            this.$refs.trainDataForm.validate(valid =>{
                 if(valid){
                     this.submiting = true
                     data = this.addForm
@@ -232,14 +233,14 @@ new Vue({
                     }
                     axios({
                         method: 'post',
-                        url: '{{ url_for("leave.add") }}',
+                        url: '{{ url_for("train.add") }}',
                         data: this.addForm,
                         headers: {'Content-Type': 'application/json'}
                     }).then(response => {
                         console.log(response)
                         if(response.data.code == 0){
                             this.$message.success('添加成功')
-                            this.$refs.leaveDataForm.resetFields()
+                            this.$refs.trainDataForm.resetFields()
                         }else{
                             this.$message.error('添加失败，msg:' + response.data.msg)
                         }
@@ -254,18 +255,18 @@ new Vue({
         },
         //取消
         handleCancel(){
-            this.$refs.leaveDataForm.resetFields()
+            this.$refs.trainDataForm.resetFields()
             this.dialogFormVisible=false
         },
         //关闭dialog
         closeDialog(){
-            this.$refs.leaveDataForm.resetFields()
+            this.$refs.trainDataForm.resetFields()
             this.refresh_table()
         },
         //删除
-        del_leaves(){
+        del_trains(){
             let ids = []
-            this.$refs.leaveList.selection.map(item => ids.push(item.id))
+            this.$refs.trainList.selection.map(item => ids.push(item.id))
             if(ids.length == 0){
                 this.$message({
                     showClose: true,
@@ -276,7 +277,7 @@ new Vue({
             }
             axios({
                 method: 'post',
-                url: '{{ url_for("leave.delete") }}',
+                url: '{{ url_for("train.delete") }}',
                 data: {ids: ids}
             }).then(response => {
                 if(response.data.code == 0){
@@ -289,58 +290,6 @@ new Vue({
                 this.$message.error('删除失败，请联系管理员或稍后重试')
             })
         },
-{#        beforeUpload(file){#}
-{#            let filetype = file.type#}
-{#            console.log(filetype)#}
-{#            types = [#}
-{#                'application/vnd.ms-excel',#}
-{#                'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'#}
-{#            ]#}
-{#            if(types.indexOf(filetype) == -1){#}
-{#                this.$message({#}
-{#                    type: 'error',#}
-{#                    message: '文件类型不正确，请重新选择',#}
-{#                    showClose: true#}
-{#                })#}
-{#                return false#}
-{#            }else{#}
-{#                return true#}
-{#            }#}
-{#        },#}
-{#        uploadProgress(){#}
-{#            this.loadObject = this.$loading({#}
-{#                lock: true,#}
-{#                text: '正在导入，请稍候',#}
-{#                spinner: 'el-icon-loading',#}
-{#                background: 'rgba(0,0,0,0.7)'#}
-{#            })#}
-{#        },#}
-{#        uploadSuccess(res, file){#}
-{#            console.log(res)#}
-{#            console.log(file)#}
-{#            this.loadObject.close()#}
-{#            if(res['code'] != 0){#}
-{#                this.$message({#}
-{#                    type: 'error',#}
-{#                    message: res['msg'],#}
-{#                    showClose: true#}
-{#                })#}
-{#            }else{#}
-{#                this.$message({#}
-{#                    type: 'success',#}
-{#                    message:'总共'+res['total']+'条，成功'+res['success_count']+'条，失败'+res['error_count']+'条',#}
-{#                    showClose: true,#}
-{#                })#}
-{#                this.get_nurses()#}
-{#            }#}
-{#        },#}
-{#        uploadError(res, file){#}
-{#            console.log(res)#}
-{#            console.log(file)#}
-{#            this.loadObject.close()#}
-{#            this.$message.error('导入失败，请稍后重试')#}
-{#        },#}
-
         handleSizeChange(val){
             let total_page = Math.ceil(this.total / val)
             if(this.currentPage>total_page){

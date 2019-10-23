@@ -46,7 +46,7 @@
                     <el-menu-item><a href="{{ url_for('nurse.index') }}">首页</a></el-menu-item>
                     <el-menu-item><a href="{{ url_for('transfer.index') }}">人员调动</a></el-menu-item>
                     <el-menu-item><a>考试</a></el-menu-item>
-                    <el-menu-item><a>进修</a></el-menu-item>
+                    <el-menu-item><a href="{{ url_for('train.index') }}">进修</a></el-menu-item>
                     <el-menu-item><a href="{{ url_for('leave.index') }}">休假</a></el-menu-item>
                     <el-submenu index="1" style='float:right;margin-right:50px;width:150px;text-align: left;'>
                         <template slot="title">{[ nickname ]}</template>

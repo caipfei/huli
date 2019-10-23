@@ -1,8 +1,7 @@
 from flask import Blueprint, render_template, jsonify, url_for, redirect, request, make_response, \
     current_app
 from ..models import User, Nurse, Dept
-from .. import db
-from ..decorators import login_required
+from ..decorators import login_required, login_required_ajax
 from datetime import datetime, timedelta
 
 main = Blueprint('main', __name__)
@@ -53,14 +52,13 @@ def login():
 '''登出'''
 @main.route('/logout')
 def logout():
-    # response = make_response(render_template('login.html', alert_msg='', alert_show='false'))
     response = make_response(redirect(url_for('.index')))
     response.delete_cookie('sessionid')
     return response
 
 '''获取科室列表'''
 @main.route('/get_dept', methods=['GET'])
-@login_required
+@login_required_ajax
 def get_dept():
     depts = Dept.query.all()
     data = []

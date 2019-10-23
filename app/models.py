@@ -38,6 +38,7 @@ class Nurse(db.Model):
     status = db.Column(db.String(32))                   #身份
     transfers = db.relationship('Transfer', backref='nurse')
     leaves = db.relationship('Leave', backref='nurse')
+    trains = db.relationship('Train', backref='nurse')
 
     def to_dict(self):
         birth_date = self.birth_date.strftime('%Y-%m-%d') if self.birth_date else None
@@ -105,6 +106,19 @@ class Leave(db.Model):
     leave_type = db.Column(db.String(32), nullable=False)
     remark = db.Column(db.String(255))
 
+class Train(db.Model):
+    __tablename__ = 'train'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    emp_sn = db.Column(db.String(8), db.ForeignKey('nurse.emp_sn'), nullable=False)
+    name = db.Column(db.String(64), nullable=False)
+    dept_id = db.Column(db.Integer, db.ForeignKey('dept.id'))
+    date_start = db.Column(db.Date, nullable=False)
+    date_end = db.Column(db.Date, nullable=False)
+    train_name = db.Column(db.String(128), nullable=False)
+    place = db.Column(db.String(128))
+    fee = db.Column(db.Integer)
+    remark = db.Column(db.String(255))
+
 class Dept(db.Model):
     __tablename__ = 'dept'
     id = db.Column(db.Integer, primary_key=True, autoincrement=True)  # 科室ID
@@ -114,3 +128,4 @@ class Dept(db.Model):
     outdept_trans = db.relationship('Transfer', backref='outdept', foreign_keys=[Transfer.outdept_id])
     indept_trans = db.relationship('Transfer', backref='indept', foreign_keys=[Transfer.indept_id])
     leaves = db.relationship('Leave', backref='dept')
+    trains = db.relationship('Train', backref='dept')

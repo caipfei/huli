@@ -1,16 +1,11 @@
 #!/usr/bin/env python
 #coding:utf-8
 
-from flask import Blueprint, render_template, jsonify, url_for, redirect, request, make_response, \
-    current_app
-from ..models import Dept, Leave
+from flask import Blueprint, render_template, jsonify, url_for, redirect, request
+from ..models import Leave
 from .. import db
-from ..decorators import login_required
-from datetime import datetime, timedelta
-import json
-import time
-import xlrd
-import math
+from ..decorators import login_required, login_required_ajax
+
 
 leave = Blueprint('leave', __name__)
 
@@ -25,7 +20,7 @@ def index():
     return render_template('leave/index.html')
 
 @leave.route('/get_list', methods=['GET'])
-@login_required
+@login_required_ajax
 def get_list():
     args = request.args
     page = args.get('page', 1, type=int)
@@ -57,7 +52,7 @@ def get_list():
 
 
 @leave.route('/add', methods=['POST'])
-@login_required
+@login_required_ajax
 def add():
     data = request.get_json()
     print(data)
@@ -73,7 +68,7 @@ def add():
 
 
 @leave.route('/del', methods=['POST'])
-@login_required
+@login_required_ajax
 def delete():
     data = request.get_json()
     ids = data['ids']

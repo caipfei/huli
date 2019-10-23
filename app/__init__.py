@@ -24,6 +24,9 @@ def create_app(config_name='default'):
     from .leave.views import leave
     app.register_blueprint(leave, url_prefix='/huli/leave')
 
+    from .train.views import train
+    app.register_blueprint(train, url_prefix='/huli/train')
+
     return app
 
 

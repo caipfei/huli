@@ -6,7 +6,7 @@ class BaseConfig(object):
     SQLALCHEMY_DATABASE_URI = 'mssql+pymssql://sa:root@localhost/nursing'
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SECRET_KEY = '4166a10a6f50db381db5acfd13a251d8'
-    COOKIE_EXPIRES = 3600
+    COOKIE_EXPIRES = 60 * 60                #cookie过期时间
 
 class DevConfig(BaseConfig):
     pass

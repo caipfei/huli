@@ -2,23 +2,24 @@
 #coding:utf-8
 
 from flask import Blueprint, render_template, jsonify, url_for, redirect, request
-from ..models import Transfer
+from ..models import Train
 from .. import db
 from ..decorators import login_required, login_required_ajax
 
-transfer = Blueprint('transfer', __name__)
 
-@transfer.route('/', methods=['GET'])
+train = Blueprint('train', __name__)
+
+@train.route('/')
 @login_required
 def home():
-    return redirect(url_for('.index'))
+    pass
 
-@transfer.route('/index', methods=['GET'])
+@train.route('/index')
 @login_required
 def index():
-    return render_template('transfer/index.html')
+    return render_template('train/index.html')
 
-@transfer.route('/get_list', methods=['GET'])
+@train.route('/get_list', methods=['GET'])
 @login_required_ajax
 def get_list():
     args = request.args
@@ -29,34 +30,36 @@ def get_list():
     search = args.get('search', None)
     data = []
     if search:
-        pagination = Transfer.query.filter(Transfer.name.like('%%%s%%' % search)).order_by(Transfer.trans_date.desc(), Transfer.id.desc()).paginate(page, size)
+        pagination = Train.query.filter(Train.name.like('%%%s%%' % search)).order_by(Train.id.desc()).paginate(page, size)
     else:
-        pagination = Transfer.query.order_by(Transfer.trans_date.desc(), Transfer.id.desc()).paginate(page, size)
+        pagination = Train.query.order_by(Train.id.desc()).paginate(page, size)
+
     total = pagination.total
     total_page = pagination.pages
     for item in pagination.items:
         id = item.id
         emp_sn = item.emp_sn
         name = item.name
-        outdept = item.outdept.dept_name
-        indept = item.indept.dept_name
-        trans_date = item.trans_date.strftime('%Y-%m-%d')
-        end_date = item.end_date.strftime('%Y-%m-%d') if item.end_date else None
-        trans_type = item.trans_type
+        dept = item.dept.dept_name
+        date_start = item.date_start.strftime('%Y-%m-%d')
+        date_end = item.date_end.strftime('%Y-%m-%d')
+        train_name = item.train_name
+        place = item.place
+        fee = item.fee
         remark = item.remark
-        data.append({'name': name, 'outdept': outdept, 'indept': indept, 'trans_date': trans_date, 'end_date': end_date,
-                     'trans_type': trans_type, 'remark': remark, 'id': id, 'emp_sn': emp_sn})
+        data.append({'id': id, 'emp_sn': emp_sn, 'name': name, 'dept': dept, 'date_start': date_start,
+                     'date_end': date_end, 'train_name':train_name, 'place': place, 'fee': fee, 'remark': remark})
     return jsonify({'code': 0, 'total': total, 'total_page': total_page, 'currentPage': page, 'pageSize': size, 'data': data})
 
 
-@transfer.route('/add', methods=['POST'])
+@train.route('/add', methods=['POST'])
 @login_required_ajax
 def add():
     data = request.get_json()
     print(data)
-    transfer = Transfer(**data)
+    train = Train(**data)
     try:
-        db.session.add(transfer)
+        db.session.add(train)
         db.session.commit()
         return jsonify({'code': 0})
     except Exception as e:
@@ -65,18 +68,16 @@ def add():
         return jsonify({'code': 10008, 'msg': str(e)})
 
 
-@transfer.route('/del', methods=['POST'])
+@train.route('/del', methods=['POST'])
 @login_required_ajax
 def delete():
     data = request.get_json()
     ids = data['ids']
     try:
-        Transfer.query.filter(Transfer.id.in_(ids)).delete(synchronize_session=False)
+        Train.query.filter(Train.id.in_(ids)).delete(synchronize_session=False)
         db.session.commit()
         return jsonify({'code': 0})
     except Exception as e:
         print(e)
         db.session.rollback()
         return jsonify({'code': 10005, 'msg': str(e)})
-
-
